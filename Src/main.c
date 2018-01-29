@@ -108,7 +108,14 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+<<<<<<< HEAD
 
+=======
+		/* TESTSETSET*/
+		/* TESTERRRR GITHUb */
+		/*TESTESTESTESTEST*/
+		/* heihei*/
+>>>>>>> master
 		txMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
 		txMessage.frame.id = 0x0A;
 		txMessage.frame.dlc = 8;
