@@ -108,20 +108,18 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		/* TESTSETSET*/
-		/* TESTERRRR GITHUb */
-		/*TESTESTESTESTEST*/
+
 		txMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
 		txMessage.frame.id = 0x0A;
 		txMessage.frame.dlc = 8;
-		txMessage.frame.data0 = 0xFF;
-		txMessage.frame.data1 = 0xFF;
-		txMessage.frame.data2 = 0xFF;
-		txMessage.frame.data3 = 0xFF;
-		txMessage.frame.data4 = 0xFF;
-		txMessage.frame.data5 = 0xFF;
-		txMessage.frame.data6 = 0xFF;
-		txMessage.frame.data7 = 0xFF;
+		txMessage.frame.data0 = 0x00;
+		txMessage.frame.data1 = 0x00;
+		txMessage.frame.data2 = 0x00;
+		txMessage.frame.data3 = 0x00;
+		txMessage.frame.data4 = 0x00;
+		txMessage.frame.data5 = 0x00;
+		txMessage.frame.data6 = 0x00;
+		txMessage.frame.data7 = 0x00;
 		CANSPI_Transmit(&txMessage);
 
 		HAL_Delay(1000);
