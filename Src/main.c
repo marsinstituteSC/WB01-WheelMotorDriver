@@ -109,24 +109,35 @@ int main(void) {
 
 		/* USER CODE BEGIN 3 */
 
-		/* TESTSETSET*/
-		/* TESTERRRR GITHUb */
-		/*TESTESTESTESTEST*/
-		/* heihei*/
-		txMessage.frame.idType = dEXTENDED_CAN_MSG_ID_2_0B;
-		txMessage.frame.id = 0x0A;
-		txMessage.frame.dlc = 8;
-		txMessage.frame.data0 = 0x00;
-		txMessage.frame.data1 = 0x00;
-		txMessage.frame.data2 = 0x00;
-		txMessage.frame.data3 = 0x00;
-		txMessage.frame.data4 = 0x00;
-		txMessage.frame.data5 = 0x00;
-		txMessage.frame.data6 = 0x00;
-		txMessage.frame.data7 = 0x00;
-		CANSPI_Transmit(&txMessage);
-
-		HAL_Delay(1000);
+		if(CANSPI_Receive(&rxMessage))
+		    {
+		      txMessage.frame.idType = rxMessage.frame.idType;
+		      txMessage.frame.id = rxMessage.frame.id;
+		      txMessage.frame.dlc = rxMessage.frame.dlc;
+		      txMessage.frame.data0++;
+		      txMessage.frame.data1 = rxMessage.frame.data1;
+		      txMessage.frame.data2 = rxMessage.frame.data2;
+		      txMessage.frame.data3 = rxMessage.frame.data3;
+		      txMessage.frame.data4 = rxMessage.frame.data4;
+		      txMessage.frame.data5 = rxMessage.frame.data5;
+		      txMessage.frame.data6 = rxMessage.frame.data6;
+		      txMessage.frame.data7 = rxMessage.frame.data7;
+		      CANSPI_Transmit(&txMessage);
+		    }
+//		txMessage.frame.idType = dEXTENDED_CAN_MSG_ID_2_0B;
+//		txMessage.frame.id = 0x0A;
+//		txMessage.frame.dlc = 8;
+//		txMessage.frame.data0 = 0x00;
+//		txMessage.frame.data1 = 0x00;
+//		txMessage.frame.data2 = 0x00;
+//		txMessage.frame.data3 = 0x00;
+//		txMessage.frame.data4 = 0x00;
+//		txMessage.frame.data5 = 0x00;
+//		txMessage.frame.data6 = 0x00;
+//		txMessage.frame.data7 = 0x00;
+//		CANSPI_Transmit(&txMessage);
+//
+//		HAL_Delay(1000);
 
 	}
 	/* USER CODE END 3 */

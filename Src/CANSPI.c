@@ -49,7 +49,7 @@ bool CANSPI_Initialize(void)
   RXM1reg.RXM1EID0 = 0x00;
   
   /* sett RxFilter verdier */
-  RXF0reg.RXF0SIDH = 0x00;      
+  RXF0reg.RXF0SIDH = 0x00;
   RXF0reg.RXF0SIDL = 0x00;      //Standard Filter
   RXF0reg.RXF0EID8 = 0x00;
   RXF0reg.RXF0EID0 = 0x00;
