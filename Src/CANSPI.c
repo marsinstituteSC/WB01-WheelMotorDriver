@@ -102,20 +102,20 @@ bool CANSPI_Initialize(void)
   MCP2515_WriteByte(MCP2515_RXB1CTRL, 0x01);    //Accept Filter 1
       
   /* 
-  * tq = 2 * (brp(0) + 1) / 16000000 = 0.125us
+  * tq = 2 * (brp(0) + 1) / 10000000 = 0.2us
   * tbit = (SYNC_SEG(1 fixed) + PROP_SEG + PS1 + PS2)
-  * tbit = 1tq + 5tq + 6tq + 4tq = 16tq
-  * 16tq = 2us = 500kbps
+  * tbit = 1tq + 1tq + 5tq + 3tq = 10tq
+  * 10tq = 2us = 500kbps
   */
   
   /* 00(SJW 1tq) 000000 */  
   MCP2515_WriteByte(MCP2515_CNF1, 0x00);
   
-  /* 1 1 100(5tq) 101(6tq) */  
-  MCP2515_WriteByte(MCP2515_CNF2, 0xE5);
+  /* 1 1 100(5tq PS1) 000(1tq PRO) */
+  MCP2515_WriteByte(MCP2515_CNF2, 0xE0);
   
-  /* 1 0 000 011(4tq) */  
-  MCP2515_WriteByte(MCP2515_CNF3, 0x83);
+  /* 1 0 000 010(3tq PS2) */
+  MCP2515_WriteByte(MCP2515_CNF3, 0x82);
   
   /* Sjekk om normalmodus • */
   if(!MCP2515_SetNormalMode())
