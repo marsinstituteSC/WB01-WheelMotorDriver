@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/jonso/Desktop/MarsNodeAtollic/MarsNodeAtollic/Inc
+HeaderPath=C:/Users/jonso/Desktop/GitHub/WB01-WheelMotorDriver/Inc
 HeaderFiles=stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=C:/Users/jonso/Desktop/MarsNodeAtollic/MarsNodeAtollic/Src
+SourcePath=C:/Users/jonso/Desktop/GitHub/WB01-WheelMotorDriver/Src
 SourceFiles=stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]
