@@ -43,6 +43,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "CANSPI.h"
+#include "motorDriver.h"
+#include "motorDriver.c"
 
 /* USER CODE END Includes */
 
@@ -123,15 +125,13 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+		MOTOR_DISABLE();
+		MOTOR_ENABLE();
 
-		HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_RESET);
 
-		HAL_Delay(5000);
-		HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
-		HAL_Delay(5000);
-//		if(periode>=50000){
-//			periode = 1000;
-//		}
+
+
+
 //		HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port,DRIVE_DIR_Pin,GPIO_PIN_SET);
 //		if(CANSPI_Receive(&rxMessage))
 //		    {
