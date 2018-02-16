@@ -1,9 +1,6 @@
 #include "motorDriver.h"
 #include "main.h"
 
-<<<<<<< HEAD
-=======
-
 
 void PWM_Set_Frekvens(uint16_t tempfart){
 
@@ -25,4 +22,4 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 	TIM4->CR1 = 0x81;
 
 }
->>>>>>> 511dfb59ec1576d27b4f03dcaad291f47cbff45a
+
