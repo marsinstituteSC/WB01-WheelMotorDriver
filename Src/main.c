@@ -41,6 +41,8 @@
 #include "stm32f4xx_hal.h"
 
 /* USER CODE BEGIN Includes */
+
+TIM_HandleTypeDef htim4;
 #include "CANSPI.h"
 #include "motorDriver.h"
 
@@ -48,7 +50,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi3;
-TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -109,6 +110,11 @@ int main(void)
 	HAL_TIM_Base_Start(&htim4);
 	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
 	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
+
+	uint16_t fart = 0;
+	bool retn = 1;
+	volatile uint16_t i = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,7 +123,17 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+//		if(fart == 32768){retn = 0;}
+//		if(fart == 0){retn = 1;}
 
+		PWM_Set_Frekvens(fart);
+		for (int var = 0; var < 84000000; ++var) {
+			i = 1;
+		}
+		fart++;
+		if(fart ==32768){fart = 32768;}
+//		if(retn == 0){fart = fart-1;}
+//		if(retn == 1){fart = fart+1;}
 
 //		if(CANSPI_Receive(&rxMessage))
 //		    {
