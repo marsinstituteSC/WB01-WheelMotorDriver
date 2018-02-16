@@ -41,16 +41,13 @@
 #include "stm32f4xx_hal.h"
 
 /* USER CODE BEGIN Includes */
-
 #include "CANSPI.h"
 #include "motorDriver.h"
-#include "motorDriver.c"
 
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi3;
-
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
@@ -113,11 +110,6 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
 	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
   /* USER CODE END 2 */
-	TIM4->ARR = 10000;
-	TIM4->CCR1 = (10000/2);
-	//			//Output enable + ARPE = 1 (Auto reload preload enable)
-	TIM4->CR1 = 0x81;
-
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -125,14 +117,8 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-		MOTOR_DISABLE();
-		MOTOR_ENABLE();
 
 
-
-
-
-//		HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port,DRIVE_DIR_Pin,GPIO_PIN_SET);
 //		if(CANSPI_Receive(&rxMessage))
 //		    {
 //		      txMessage.frame.idType = rxMessage.frame.idType;
