@@ -107,13 +107,13 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 	CANSPI_Initialize();
+//	TIM2->CCMR2 = 0x6800;
 	HAL_TIM_Base_Start(&htim4);
 	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
 	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
 
-	uint16_t fart = 0;
-	bool retn = 1;
-	volatile uint16_t i = 0;
+	uint16_t fart = 32000;
+	bool retn = 0;
 
   /* USER CODE END 2 */
 
@@ -123,17 +123,16 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-//		if(fart == 32768){retn = 0;}
-//		if(fart == 0){retn = 1;}
+		if(fart >= 32768){retn = 0;}
+		if(fart <= 100){retn = 1;}
+		if(fart >= 32768){fart = 32768;}
+		if(fart <= 100 ){fart = 100;}
 
 		PWM_Set_Frekvens(fart);
-		for (int var = 0; var < 84000000; ++var) {
-			i = 1;
-		}
-		fart++;
-		if(fart ==32768){fart = 32768;}
-//		if(retn == 0){fart = fart-1;}
-//		if(retn == 1){fart = fart+1;}
+		HAL_Delay(1);
+
+		if(retn == 0){fart = fart-10;}
+		if(retn == 1){fart = fart+10;}
 
 //		if(CANSPI_Receive(&rxMessage))
 //		    {
@@ -258,7 +257,7 @@ static void MX_TIM4_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 0;
+  htim4.Init.Prescaler = 7;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim4.Init.Period = 0;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
