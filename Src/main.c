@@ -51,6 +51,8 @@ TIM_HandleTypeDef htim4;
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi3;
 
+TIM_HandleTypeDef htim4;
+
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
@@ -111,7 +113,6 @@ int main(void)
 	HAL_TIM_Base_Start(&htim4);
 	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
 	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
-
 	uint16_t fart = 32000;
 	bool retn = 0;
 
@@ -123,16 +124,20 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-		if(fart >= 32768){retn = 0;}
-		if(fart <= 100){retn = 1;}
-		if(fart >= 32768){fart = 32768;}
-		if(fart <= 100 ){fart = 100;}
 
-		PWM_Set_Frekvens(fart);
-		HAL_Delay(1);
+		if(HAL_GPIO_ReadPin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin)){
 
-		if(retn == 0){fart = fart-10;}
-		if(retn == 1){fart = fart+10;}
+			if(fart >= 32768){retn = 0;}
+			if(fart <= 100){retn = 1;}
+			if(fart >= 32768){fart = 32768;}
+			if(fart <= 100 ){fart = 100;}
+
+			PWM_Set_Frekvens(fart);
+			HAL_Delay(1);
+
+			if(retn == 0){fart = fart-10;}
+			if(retn == 1){fart = fart+10;}
+		}
 
 //		if(CANSPI_Receive(&rxMessage))
 //		    {
