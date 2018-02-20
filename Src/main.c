@@ -50,8 +50,8 @@ TIM_HandleTypeDef htim4;
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi3;
-
 TIM_HandleTypeDef htim4;
+
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -116,6 +116,7 @@ int main(void)
 	uint16_t fart = 32000;
 	bool retn = 0;
 
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -125,26 +126,26 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
-		if(HAL_GPIO_ReadPin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin)){
-
-			if(fart >= 32768){retn = 0;}
-			if(fart <= 100){retn = 1;}
-			if(fart >= 32768){fart = 32768;}
-			if(fart <= 100 ){fart = 100;}
-
-			PWM_Set_Frekvens(fart);
-			HAL_Delay(1);
-
-			if(retn == 0){fart = fart-10;}
-			if(retn == 1){fart = fart+10;}
-		}
+//		if(HAL_GPIO_ReadPin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin)){
+//
+//			if(fart >= 32768){retn = 0;}
+//			if(fart <= 100){retn = 1;}
+//			if(fart >= 32768){fart = 32768;}
+//			if(fart <= 100 ){fart = 100;}
+//
+//			PWM_Set_Frekvens(fart);
+//			HAL_Delay(1);
+//
+//			if(retn == 0){fart = fart-10;}
+//			if(retn == 1){fart = fart+10;}
+//		}
 
 //		if(CANSPI_Receive(&rxMessage))
 //		    {
 //		      txMessage.frame.idType = rxMessage.frame.idType;
 //		      txMessage.frame.id = rxMessage.frame.id;
 //		      txMessage.frame.dlc = rxMessage.frame.dlc;
-//		      txMessage.frame.data0++;
+//		      txMessage.frame.data0 = rxMessage.frame.data0++;
 //		      txMessage.frame.data1 = rxMessage.frame.data1;
 //		      txMessage.frame.data2 = rxMessage.frame.data2;
 //		      txMessage.frame.data3 = rxMessage.frame.data3;
@@ -153,6 +154,7 @@ int main(void)
 //		      txMessage.frame.data6 = rxMessage.frame.data6;
 //		      txMessage.frame.data7 = rxMessage.frame.data7;
 //		      CANSPI_Transmit(&txMessage);
+
 //		    }
 //		txMessage.frame.idType = dEXTENDED_CAN_MSG_ID_2_0B;
 //		txMessage.frame.id = 0x0A;
@@ -344,12 +346,22 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(CAN_CS_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : CAN_INT_Pin */
+  GPIO_InitStruct.Pin = CAN_INT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(CAN_INT_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : DRIVE_DIR_Pin */
   GPIO_InitStruct.Pin = DRIVE_DIR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(DRIVE_DIR_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
