@@ -45,6 +45,8 @@
 TIM_HandleTypeDef htim4;
 #include "CANSPI.h"
 #include "motorDriver.h"
+#include "stdio.h"
+#include "stdlib.h"
 
 /* USER CODE END Includes */
 
@@ -142,19 +144,15 @@ int main(void)
 
 //		if(CANSPI_Receive(&rxMessage))
 //		    {
-//		      txMessage.frame.idType = rxMessage.frame.idType;
-//		      txMessage.frame.id = rxMessage.frame.id;
-//		      txMessage.frame.dlc = rxMessage.frame.dlc;
-//		      txMessage.frame.data0 = rxMessage.frame.data0++;
-//		      txMessage.frame.data1 = rxMessage.frame.data1;
-//		      txMessage.frame.data2 = rxMessage.frame.data2;
-//		      txMessage.frame.data3 = rxMessage.frame.data3;
-//		      txMessage.frame.data4 = rxMessage.frame.data4;
-//		      txMessage.frame.data5 = rxMessage.frame.data5;
-//		      txMessage.frame.data6 = rxMessage.frame.data6;
-//		      txMessage.frame.data7 = rxMessage.frame.data7;
-//		      CANSPI_Transmit(&txMessage);
-
+////			if((rxMessage.frame.data0-rxMessage.frame.data1)<= 0){
+////				MOTOR_BAK();
+////			}else{
+////				MOTOR_FRAM();
+////			}
+//			if(rxMessage.frame.data0==0){
+//				PWM_Set_Frekvens(0);
+//			}
+//		    PWM_Set_Frekvens(rxMessage.frame.data0);
 //		    }
 //		txMessage.frame.idType = dEXTENDED_CAN_MSG_ID_2_0B;
 //		txMessage.frame.id = 0x0A;

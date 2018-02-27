@@ -34,6 +34,8 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
+#include "CANSPI.h"
+#include "motorDriver.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -98,7 +100,40 @@ void SysTick_Handler(void)
 */
 void EXTI15_10_IRQHandler(void)
 {
+
+	uCAN_MSG rxMessage;
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+
+//	if(CANSPI_Receive(&rxMessage))
+//	    {
+//
+//		if(rxMessage.frame.data0==0){
+//			PWM_Set_Frekvens(0);
+//		}
+//	    PWM_Set_Frekvens(rxMessage.frame.data0);
+//	    }
+	if(CANSPI_Receive(&rxMessage))
+	    {
+		if((rxMessage.frame.data0)>=1){
+//			MOTOR_FRAM();
+			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_SET);
+			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
+			PWM_Set_Frekvens(rxMessage.frame.data0);
+		}
+		else if((rxMessage.frame.data1)>=1){
+			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_RESET);
+			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
+			PWM_Set_Frekvens(rxMessage.frame.data1);
+		}
+		else{PWM_Set_Frekvens(0);}
+//		if((rxMessage.frame.data0==0) & (rxMessage.frame.data1==0)){
+//			PWM_Set_Frekvens(0);
+//		}
+
+
+	    }
 
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
