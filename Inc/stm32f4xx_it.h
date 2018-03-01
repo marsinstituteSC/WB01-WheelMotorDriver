@@ -50,7 +50,7 @@
 void SVC_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
-void SPI3_IRQHandler(void);
+void EXTI15_10_IRQHandler(void);
 
 #ifdef __cplusplus
 }

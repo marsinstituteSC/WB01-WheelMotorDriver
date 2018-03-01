@@ -100,6 +100,7 @@ bool CANSPI_Initialize(void)
   /* Accept All (Standard + Extended) */
   MCP2515_WriteByte(MCP2515_RXB0CTRL, 0x04);    //Enable BUKT, Accept Filter 0
   MCP2515_WriteByte(MCP2515_RXB1CTRL, 0x01);    //Accept Filter 1
+  MCP2515_WriteByte(MCP2515_CANINTE, 0x03);		//Enable interrupt on RXB0/RXB1
       
   /* 
   * tq = 2 * (brp(0) + 1) / 10000000 = 0.2us
@@ -199,7 +200,7 @@ uint8_t CANSPI_Receive(uCAN_MSG *tempCanMsg)
     {
       tempCanMsg->frame.idType = (uint8_t) dEXTENDED_CAN_MSG_ID_2_0B;
       tempCanMsg->frame.id = convertReg2ExtendedCANid(rxReg.RXBnEID8, rxReg.RXBnEID0, rxReg.RXBnSIDH, rxReg.RXBnSIDL);
-    } 
+    }
     else 
     {
       /* Standard type */
@@ -217,6 +218,7 @@ uint8_t CANSPI_Receive(uCAN_MSG *tempCanMsg)
     tempCanMsg->frame.data6 = rxReg.RXBnD6;
     tempCanMsg->frame.data7 = rxReg.RXBnD7;
     
+    MCP2515_WriteByte(MCP2515_CANINTF,0x00); // Resetter flagg
     returnValue = 1;
   }
   

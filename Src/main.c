@@ -45,11 +45,15 @@
 TIM_HandleTypeDef htim4;
 #include "CANSPI.h"
 #include "motorDriver.h"
+#include "stdio.h"
+#include "stdlib.h"
 
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi3;
+TIM_HandleTypeDef htim4;
+
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -107,13 +111,13 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 	CANSPI_Initialize();
+//	TIM2->CCMR2 = 0x6800;
 	HAL_TIM_Base_Start(&htim4);
 	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
 	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
+	uint16_t fart = 32000;
+	bool retn = 0;
 
-	uint16_t fart = 0;
-	bool retn = 1;
-	volatile uint16_t i = 0;
 
   /* USER CODE END 2 */
 
@@ -123,32 +127,32 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-//		if(fart == 32768){retn = 0;}
-//		if(fart == 0){retn = 1;}
 
-		PWM_Set_Frekvens(fart);
-		for (int var = 0; var < 84000000; ++var) {
-			i = 1;
-		}
-		fart++;
-		if(fart ==32768){fart = 32768;}
-//		if(retn == 0){fart = fart-1;}
-//		if(retn == 1){fart = fart+1;}
+//		if(HAL_GPIO_ReadPin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin)){
+//
+//			if(fart >= 32768){retn = 0;}
+//			if(fart <= 100){retn = 1;}
+//			if(fart >= 32768){fart = 32768;}
+//			if(fart <= 100 ){fart = 100;}
+//
+//			PWM_Set_Frekvens(fart);
+//			HAL_Delay(1);
+//
+//			if(retn == 0){fart = fart-10;}
+//			if(retn == 1){fart = fart+10;}
+//		}
 
 //		if(CANSPI_Receive(&rxMessage))
 //		    {
-//		      txMessage.frame.idType = rxMessage.frame.idType;
-//		      txMessage.frame.id = rxMessage.frame.id;
-//		      txMessage.frame.dlc = rxMessage.frame.dlc;
-//		      txMessage.frame.data0++;
-//		      txMessage.frame.data1 = rxMessage.frame.data1;
-//		      txMessage.frame.data2 = rxMessage.frame.data2;
-//		      txMessage.frame.data3 = rxMessage.frame.data3;
-//		      txMessage.frame.data4 = rxMessage.frame.data4;
-//		      txMessage.frame.data5 = rxMessage.frame.data5;
-//		      txMessage.frame.data6 = rxMessage.frame.data6;
-//		      txMessage.frame.data7 = rxMessage.frame.data7;
-//		      CANSPI_Transmit(&txMessage);
+////			if((rxMessage.frame.data0-rxMessage.frame.data1)<= 0){
+////				MOTOR_BAK();
+////			}else{
+////				MOTOR_FRAM();
+////			}
+//			if(rxMessage.frame.data0==0){
+//				PWM_Set_Frekvens(0);
+//			}
+//		    PWM_Set_Frekvens(rxMessage.frame.data0);
 //		    }
 //		txMessage.frame.idType = dEXTENDED_CAN_MSG_ID_2_0B;
 //		txMessage.frame.id = 0x0A;
@@ -258,7 +262,7 @@ static void MX_TIM4_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 0;
+  htim4.Init.Prescaler = 7;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim4.Init.Period = 0;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -340,12 +344,22 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(CAN_CS_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : CAN_INT_Pin */
+  GPIO_InitStruct.Pin = CAN_INT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(CAN_INT_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : DRIVE_DIR_Pin */
   GPIO_InitStruct.Pin = DRIVE_DIR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(DRIVE_DIR_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 

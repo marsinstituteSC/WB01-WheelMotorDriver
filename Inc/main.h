@@ -51,6 +51,9 @@
 #define DRIVE_EN_GPIO_Port GPIOA
 #define CAN_CS_Pin GPIO_PIN_8
 #define CAN_CS_GPIO_Port GPIOE
+#define CAN_INT_Pin GPIO_PIN_10
+#define CAN_INT_GPIO_Port GPIOE
+#define CAN_INT_EXTI_IRQn EXTI15_10_IRQn
 #define DRIVE_DIR_Pin GPIO_PIN_14
 #define DRIVE_DIR_GPIO_Port GPIOE
 #define DRIVE_PWM_Pin GPIO_PIN_12
