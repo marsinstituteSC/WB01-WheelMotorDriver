@@ -102,6 +102,8 @@ void EXTI15_10_IRQHandler(void)
 {
 
 	uCAN_MSG rxMessage;
+	int16_t fart;
+	uint8_t retning;
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 
 //	if(CANSPI_Receive(&rxMessage))
@@ -114,18 +116,20 @@ void EXTI15_10_IRQHandler(void)
 //	    }
 	if(CANSPI_Receive(&rxMessage))
 	    {
-		if((rxMessage.frame.data0)>=1){
+		retning = (rxMessage.frame.data0>>7)&0x1;
+		fart = ((rxMessage.frame.data0<<8)+rxMessage.frame.data1);
+		if((fart>=1)){
 //			MOTOR_FRAM();
 			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_SET);
 			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
-			PWM_Set_Frekvens(rxMessage.frame.data0);
+			PWM_Set_Frekvens(fart);
 		}
-		else if((rxMessage.frame.data1)>=1){
+		else if((fart<=-1)){
 			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_RESET);
 			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
-			PWM_Set_Frekvens(rxMessage.frame.data1);
+			PWM_Set_Frekvens(-fart);
 		}
 		else{PWM_Set_Frekvens(0);}
 //		if((rxMessage.frame.data0==0) & (rxMessage.frame.data1==0)){

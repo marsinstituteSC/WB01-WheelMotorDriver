@@ -16,9 +16,8 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 
 	if(tempfart >= 1){
 
-//		tempfart = (65000000-1000*3215*exp(tempfart2/10922))/1000;
-		tempfart = 10500000000 / (tempfart*5826*128);
-		if (tempfart <=54){tempfart = 54;}
+		tempfart = 10500000000 / (tempfart*5826); //*128
+		if (tempfart <=55){tempfart = 55;}
 		if (tempfart >= 65000){tempfart = 65000;}
 
 		TIM4->ARR = tempfart;
