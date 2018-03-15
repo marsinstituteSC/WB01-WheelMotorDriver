@@ -33,3 +33,4 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 		TIM4->CR1 = 0x81;
 	}
 }
+
