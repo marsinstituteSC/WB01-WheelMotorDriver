@@ -17,7 +17,7 @@ Common symbol       size              file
 htim4               0x3c              Src\main.o
 uwTick              0x4               Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
 pFlash              0x20              Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash.o
-hspi3               0x58              Src\main.o
+hspi3               0x58              Src\CANSPI.o
 errorStatus         0x4               Src\CANSPI.o
 txMessage           0x14              Src\main.o
 ctrlStatus          0x4               Src\CANSPI.o
@@ -743,7 +743,6 @@ Discarded input sections
                 0x00000000       0x18 Src\CANSPI.o
  .text.CANSPI_isTxErrorPassive
                 0x00000000       0x18 Src\CANSPI.o
- COMMON         0x00000000        0xc Src\CANSPI.o
  .text          0x00000000        0x0 Src\MCP2515.o
  .data          0x00000000        0x0 Src\MCP2515.o
  .bss           0x00000000        0x0 Src\MCP2515.o
@@ -1014,11 +1013,12 @@ LOAD c:/program files (x86)/atollic/truestudio for stm32 9.0.0/armtools/bin/../l
                 0x080018a4       0x44 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim_ex.o
                 0x080018a4                HAL_TIMEx_MasterConfigSynchronization
  .text.CANSPI_Initialize
-                0x080018e8      0x128 Src\CANSPI.o
+                0x080018e8      0x126 Src\CANSPI.o
                 0x080018e8                CANSPI_Initialize
  .text.CANSPI_Receive
-                0x08001a10       0xb0 Src\CANSPI.o
-                0x08001a10                CANSPI_Receive
+                0x08001a0e       0xb0 Src\CANSPI.o
+                0x08001a0e                CANSPI_Receive
+ *fill*         0x08001abe        0x2 
  .text.SPI_Tx   0x08001ac0       0x1c Src\MCP2515.o
  .text.SPI_Rx   0x08001adc       0x20 Src\MCP2515.o
  .text.MCP2515_Initialize
@@ -1270,7 +1270,7 @@ LOAD c:/program files (x86)/atollic/truestudio for stm32 9.0.0/armtools/bin/../l
                 0x10000000                _eccmram = .
                 0x10000000                . = ALIGN (0x4)
 
-.bss            0x20000004       0xe0
+.bss            0x20000004       0xec
                 0x20000004                _sbss = .
                 0x20000004                __bss_start__ = _sbss
  *(.bss)
@@ -1279,26 +1279,30 @@ LOAD c:/program files (x86)/atollic/truestudio for stm32 9.0.0/armtools/bin/../l
  *(COMMON)
  COMMON         0x20000020        0x4 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
                 0x20000020                uwTick
- COMMON         0x20000024       0xc0 Src\main.o
-                0x20000024                htim4
-                0x20000060                hspi3
-                0x200000b8                txMessage
-                0x200000cc                periode
-                0x200000d0                rxMessage
-                0x200000e4                . = ALIGN (0x4)
-                0x200000e4                _ebss = .
-                0x200000e4                __bss_end__ = _ebss
+ COMMON         0x20000024       0x64 Src\CANSPI.o
+                0x20000024                hspi3
+                0x2000007c                errorStatus
+                0x20000080                ctrlStatus
+                0x20000084                idReg
+ COMMON         0x20000088       0x68 Src\main.o
+                0x20000088                htim4
+                0x200000c4                txMessage
+                0x200000d8                periode
+                0x200000dc                rxMessage
+                0x200000f0                . = ALIGN (0x4)
+                0x200000f0                _ebss = .
+                0x200000f0                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x200000e4      0x600
-                0x200000e4                . = ALIGN (0x4)
+                0x200000f0      0x600
+                0x200000f0                . = ALIGN (0x4)
                 [!provide]                PROVIDE (end, .)
                 [!provide]                PROVIDE (_end, .)
-                0x200002e4                . = (. + _Min_Heap_Size)
- *fill*         0x200000e4      0x200 
-                0x200006e4                . = (. + _Min_Stack_Size)
- *fill*         0x200002e4      0x400 
-                0x200006e4                . = ALIGN (0x4)
+                0x200002f0                . = (. + _Min_Heap_Size)
+ *fill*         0x200000f0      0x200 
+                0x200006f0                . = (. + _Min_Stack_Size)
+ *fill*         0x200002f0      0x400 
+                0x200006f0                . = ALIGN (0x4)
 
 /DISCARD/
  libc.a(*)
@@ -1356,7 +1360,7 @@ LOAD c:/program files (x86)/atollic/truestudio for stm32 9.0.0/armtools/bin/../l
                 0x00000463       0x22 c:/program files (x86)/atollic/truestudio for stm32 9.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtn.o
 OUTPUT(WheelMotorDriver.elf elf32-littlearm)
 
-.debug_info     0x00000000    0x15613
+.debug_info     0x00000000    0x15b13
  .debug_info    0x00000000     0x1100 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
  .debug_info    0x00001100     0x1744 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.o
  .debug_info    0x00002844      0xf88 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.o
@@ -1364,16 +1368,16 @@ OUTPUT(WheelMotorDriver.elf elf32-littlearm)
  .debug_info    0x00004a08     0x23d2 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_spi.o
  .debug_info    0x00006dda     0x3ba2 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim.o
  .debug_info    0x0000a97c     0x19a5 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim_ex.o
- .debug_info    0x0000c321     0x168d Src\CANSPI.o
- .debug_info    0x0000d9ae     0x18c8 Src\MCP2515.o
- .debug_info    0x0000f276     0x1e8f Src\main.o
- .debug_info    0x00011105      0xe73 Src\motorDriver.o
- .debug_info    0x00011f78     0x1795 Src\stm32f4xx_hal_msp.o
- .debug_info    0x0001370d     0x116a Src\stm32f4xx_it.o
- .debug_info    0x00014877      0xd1c Src\system_stm32f4xx.o
- .debug_info    0x00015593       0x80 startup\startup_stm32f407xx.o
+ .debug_info    0x0000c321     0x1b63 Src\CANSPI.o
+ .debug_info    0x0000de84     0x18f2 Src\MCP2515.o
+ .debug_info    0x0000f776     0x1e8f Src\main.o
+ .debug_info    0x00011605      0xe73 Src\motorDriver.o
+ .debug_info    0x00012478     0x1795 Src\stm32f4xx_hal_msp.o
+ .debug_info    0x00013c0d     0x116a Src\stm32f4xx_it.o
+ .debug_info    0x00014d77      0xd1c Src\system_stm32f4xx.o
+ .debug_info    0x00015a93       0x80 startup\startup_stm32f407xx.o
 
-.debug_abbrev   0x00000000     0x281c
+.debug_abbrev   0x00000000     0x283a
  .debug_abbrev  0x00000000      0x2cf Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
  .debug_abbrev  0x000002cf      0x399 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.o
  .debug_abbrev  0x00000668      0x268 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.o
@@ -1381,14 +1385,14 @@ OUTPUT(WheelMotorDriver.elf elf32-littlearm)
  .debug_abbrev  0x00000c18      0x3ac Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_spi.o
  .debug_abbrev  0x00000fc4      0x3ac Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim.o
  .debug_abbrev  0x00001370      0x300 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim_ex.o
- .debug_abbrev  0x00001670      0x33e Src\CANSPI.o
- .debug_abbrev  0x000019ae      0x2d1 Src\MCP2515.o
- .debug_abbrev  0x00001c7f      0x325 Src\main.o
- .debug_abbrev  0x00001fa4      0x1e6 Src\motorDriver.o
- .debug_abbrev  0x0000218a      0x24a Src\stm32f4xx_hal_msp.o
- .debug_abbrev  0x000023d4      0x26c Src\stm32f4xx_it.o
- .debug_abbrev  0x00002640      0x1ca Src\system_stm32f4xx.o
- .debug_abbrev  0x0000280a       0x12 startup\startup_stm32f407xx.o
+ .debug_abbrev  0x00001670      0x34b Src\CANSPI.o
+ .debug_abbrev  0x000019bb      0x2e2 Src\MCP2515.o
+ .debug_abbrev  0x00001c9d      0x325 Src\main.o
+ .debug_abbrev  0x00001fc2      0x1e6 Src\motorDriver.o
+ .debug_abbrev  0x000021a8      0x24a Src\stm32f4xx_hal_msp.o
+ .debug_abbrev  0x000023f2      0x26c Src\stm32f4xx_it.o
+ .debug_abbrev  0x0000265e      0x1ca Src\system_stm32f4xx.o
+ .debug_abbrev  0x00002828       0x12 startup\startup_stm32f407xx.o
 
 .debug_loc      0x00000000     0x64b9
  .debug_loc     0x00000000       0x69 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
@@ -1454,7 +1458,7 @@ OUTPUT(WheelMotorDriver.elf elf32-littlearm)
  .debug_ranges  0x00000b00       0x18 Src\system_stm32f4xx.o
  .debug_ranges  0x00000b18       0x20 startup\startup_stm32f407xx.o
 
-.debug_line     0x00000000     0x5058
+.debug_line     0x00000000     0x50f3
  .debug_line    0x00000000      0x43b Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
  .debug_line    0x0000043b      0x4dc Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.o
  .debug_line    0x00000917      0x47a Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.o
@@ -1462,14 +1466,14 @@ OUTPUT(WheelMotorDriver.elf elf32-littlearm)
  .debug_line    0x00001310      0xbb2 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_spi.o
  .debug_line    0x00001ec2     0x117f Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim.o
  .debug_line    0x00003041      0x6cb Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim_ex.o
- .debug_line    0x0000370c      0x38a Src\CANSPI.o
- .debug_line    0x00003a96      0x466 Src\MCP2515.o
- .debug_line    0x00003efc      0x47a Src\main.o
- .debug_line    0x00004376      0x329 Src\motorDriver.o
- .debug_line    0x0000469f      0x37d Src\stm32f4xx_hal_msp.o
- .debug_line    0x00004a1c      0x348 Src\stm32f4xx_it.o
- .debug_line    0x00004d64      0x275 Src\system_stm32f4xx.o
- .debug_line    0x00004fd9       0x7f startup\startup_stm32f407xx.o
+ .debug_line    0x0000370c      0x40b Src\CANSPI.o
+ .debug_line    0x00003b17      0x473 Src\MCP2515.o
+ .debug_line    0x00003f8a      0x487 Src\main.o
+ .debug_line    0x00004411      0x329 Src\motorDriver.o
+ .debug_line    0x0000473a      0x37d Src\stm32f4xx_hal_msp.o
+ .debug_line    0x00004ab7      0x348 Src\stm32f4xx_it.o
+ .debug_line    0x00004dff      0x275 Src\system_stm32f4xx.o
+ .debug_line    0x00005074       0x7f startup\startup_stm32f407xx.o
 
 .debug_str      0x00000000     0x3cf4
  .debug_str     0x00000000      0xe6c Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
@@ -1486,9 +1490,9 @@ OUTPUT(WheelMotorDriver.elf elf32-littlearm)
                                0x1834 (size before relaxing)
  .debug_str     0x00002ed2      0x50d Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim_ex.o
                                0x10f4 (size before relaxing)
- .debug_str     0x000033df      0x656 Src\CANSPI.o
-                                0xc89 (size before relaxing)
- .debug_str     0x00003a35       0xad Src\MCP2515.o
+ .debug_str     0x000033df      0x65c Src\CANSPI.o
+                               0x10b7 (size before relaxing)
+ .debug_str     0x00003a3b       0xa7 Src\MCP2515.o
                                 0xcbd (size before relaxing)
  .debug_str     0x00003ae2       0xb0 Src\main.o
                                0x1766 (size before relaxing)

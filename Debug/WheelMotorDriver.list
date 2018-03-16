@@ -19,29 +19,29 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, DATA
   7 .ccmram       00000000  10000000  10000000  00020004  2**0
                   CONTENTS
-  8 .bss          000000e0  20000004  20000004  00020004  2**2
+  8 .bss          000000ec  20000004  20000004  00020004  2**2
                   ALLOC
-  9 ._user_heap_stack 00000600  200000e4  200000e4  00020004  2**0
+  9 ._user_heap_stack 00000600  200000f0  200000f0  00020004  2**0
                   ALLOC
  10 .ARM.attributes 00000030  00000000  00000000  00020004  2**0
                   CONTENTS, READONLY
- 11 .debug_info   00015613  00000000  00000000  00020034  2**0
+ 11 .debug_info   00015b13  00000000  00000000  00020034  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_abbrev 0000281c  00000000  00000000  00035647  2**0
+ 12 .debug_abbrev 0000283a  00000000  00000000  00035b47  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_loc    000064b9  00000000  00000000  00037e63  2**0
+ 13 .debug_loc    000064b9  00000000  00000000  00038381  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_aranges 00000920  00000000  00000000  0003e320  2**3
+ 14 .debug_aranges 00000920  00000000  00000000  0003e840  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_ranges 00000b38  00000000  00000000  0003ec40  2**3
+ 15 .debug_ranges 00000b38  00000000  00000000  0003f160  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_line   00005058  00000000  00000000  0003f778  2**0
+ 16 .debug_line   000050f3  00000000  00000000  0003fc98  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_str    00003cf4  00000000  00000000  000447d0  2**0
+ 17 .debug_str    00003cf4  00000000  00000000  00044d8b  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .comment      0000007c  00000000  00000000  000484c4  2**0
+ 18 .comment      0000007c  00000000  00000000  00048a7f  2**0
                   CONTENTS, READONLY
- 19 .debug_frame  00001b90  00000000  00000000  00048540  2**2
+ 19 .debug_frame  00001b90  00000000  00000000  00048afc  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -3594,311 +3594,308 @@ static void TIM_ITRx_SetConfig(TIM_TypeDef *TIMx, uint16_t TIM_ITRx)
 /* CAN initialisering  */
 bool CANSPI_Initialize(void)
 {
- 80018e8:	b530      	push	{r4, r5, lr}
- 80018ea:	b089      	sub	sp, #36	; 0x24
+ 80018e8:	b510      	push	{r4, lr}
+ 80018ea:	b088      	sub	sp, #32
   RXF5 RXF5reg;
   RXM0 RXM0reg;
   RXM1 RXM1reg;
       
   /* sett Rx Mask-verdier*/
-  RXM0reg.RXM0SIDH = 0x00;
+  RXM0reg.RXM0SIDH = (mask0&0x7F8)>>3;
  80018ec:	2400      	movs	r4, #0
-  RXF0reg.RXF0SIDL = 0x00;      //Standard Filter
-  RXF0reg.RXF0EID8 = 0x00;
-  RXF0reg.RXF0EID0 = 0x00;
-  
-  RXF1reg.RXF1SIDH = 0x00;
-  RXF1reg.RXF1SIDL = 0x08;      //Extended Filter
- 80018ee:	2508      	movs	r5, #8
-  RXM0reg.RXM0SIDH = 0x00;
- 80018f0:	f88d 4018 	strb.w	r4, [sp, #24]
-  RXM0reg.RXM0SIDL = 0x00;
- 80018f4:	f88d 4019 	strb.w	r4, [sp, #25]
+ 80018ee:	f88d 4018 	strb.w	r4, [sp, #24]
+  RXM0reg.RXM0SIDL = (mask0&0x7)<<5;
+ 80018f2:	f88d 4019 	strb.w	r4, [sp, #25]
   RXM0reg.RXM0EID8 = 0x00;
- 80018f8:	f88d 401a 	strb.w	r4, [sp, #26]
+ 80018f6:	f88d 401a 	strb.w	r4, [sp, #26]
   RXM0reg.RXM0EID0 = 0x00;
- 80018fc:	f88d 401b 	strb.w	r4, [sp, #27]
-  RXM1reg.RXM1SIDH = 0x00;
- 8001900:	f88d 401c 	strb.w	r4, [sp, #28]
-  RXM1reg.RXM1SIDL = 0x00;
- 8001904:	f88d 401d 	strb.w	r4, [sp, #29]
+ 80018fa:	f88d 401b 	strb.w	r4, [sp, #27]
+  
+  RXM1reg.RXM1SIDH = (mask1&0x7F8)>>3;
+ 80018fe:	f88d 401c 	strb.w	r4, [sp, #28]
+  RXM1reg.RXM1SIDL = (mask1&0x7)<<5;
+ 8001902:	f88d 401d 	strb.w	r4, [sp, #29]
   RXM1reg.RXM1EID8 = 0x00;
- 8001908:	f88d 401e 	strb.w	r4, [sp, #30]
+ 8001906:	f88d 401e 	strb.w	r4, [sp, #30]
   RXM1reg.RXM1EID0 = 0x00;
- 800190c:	f88d 401f 	strb.w	r4, [sp, #31]
-  RXF0reg.RXF0SIDH = 0x00;
- 8001910:	f88d 4000 	strb.w	r4, [sp]
-  RXF0reg.RXF0SIDL = 0x00;      //Standard Filter
- 8001914:	f88d 4001 	strb.w	r4, [sp, #1]
+ 800190a:	f88d 401f 	strb.w	r4, [sp, #31]
+  
+  /* sett RxFilter verdier */
+  RXF0reg.RXF0SIDH = (filter0&0x7F8)>>3;
+ 800190e:	f88d 4000 	strb.w	r4, [sp]
+  RXF0reg.RXF0SIDL = (filter0&0x7)<<5;     //Standard Filter
+ 8001912:	f88d 4001 	strb.w	r4, [sp, #1]
   RXF0reg.RXF0EID8 = 0x00;
- 8001918:	f88d 4002 	strb.w	r4, [sp, #2]
+ 8001916:	f88d 4002 	strb.w	r4, [sp, #2]
   RXF0reg.RXF0EID0 = 0x00;
- 800191c:	f88d 4003 	strb.w	r4, [sp, #3]
-  RXF1reg.RXF1SIDH = 0x00;
- 8001920:	f88d 4004 	strb.w	r4, [sp, #4]
-  RXF1reg.RXF1SIDL = 0x08;      //Extended Filter
- 8001924:	f88d 5005 	strb.w	r5, [sp, #5]
+ 800191a:	f88d 4003 	strb.w	r4, [sp, #3]
+  
+  RXF1reg.RXF1SIDH = (filter1&0x7F8)>>3;
+ 800191e:	f88d 4004 	strb.w	r4, [sp, #4]
+  RXF1reg.RXF1SIDL = (filter1&0x7)<<5;     //Extended Filter
+ 8001922:	f88d 4005 	strb.w	r4, [sp, #5]
   RXF1reg.RXF1EID8 = 0x00;
- 8001928:	f88d 4006 	strb.w	r4, [sp, #6]
+ 8001926:	f88d 4006 	strb.w	r4, [sp, #6]
   RXF1reg.RXF1EID0 = 0x00;
- 800192c:	f88d 4007 	strb.w	r4, [sp, #7]
+ 800192a:	f88d 4007 	strb.w	r4, [sp, #7]
   
-  RXF2reg.RXF2SIDH = 0x00;
- 8001930:	f88d 4008 	strb.w	r4, [sp, #8]
-  RXF2reg.RXF2SIDL = 0x00;
- 8001934:	f88d 4009 	strb.w	r4, [sp, #9]
+  RXF2reg.RXF2SIDH = (filter2&0x7F8)>>3;
+ 800192e:	f88d 4008 	strb.w	r4, [sp, #8]
+  RXF2reg.RXF2SIDL = (filter2&0x7)<<5;
+ 8001932:	f88d 4009 	strb.w	r4, [sp, #9]
   RXF2reg.RXF2EID8 = 0x00;
- 8001938:	f88d 400a 	strb.w	r4, [sp, #10]
+ 8001936:	f88d 400a 	strb.w	r4, [sp, #10]
   RXF2reg.RXF2EID0 = 0x00;
- 800193c:	f88d 400b 	strb.w	r4, [sp, #11]
+ 800193a:	f88d 400b 	strb.w	r4, [sp, #11]
   
-  RXF3reg.RXF3SIDH = 0x00;
- 8001940:	f88d 400c 	strb.w	r4, [sp, #12]
-  RXF3reg.RXF3SIDL = 0x00;
- 8001944:	f88d 400d 	strb.w	r4, [sp, #13]
+  RXF3reg.RXF3SIDH = (filter3&0x7F8)>>3;
+ 800193e:	f88d 400c 	strb.w	r4, [sp, #12]
+  RXF3reg.RXF3SIDL = (filter3&0x7)<<5;
+ 8001942:	f88d 400d 	strb.w	r4, [sp, #13]
   RXF3reg.RXF3EID8 = 0x00;
- 8001948:	f88d 400e 	strb.w	r4, [sp, #14]
+ 8001946:	f88d 400e 	strb.w	r4, [sp, #14]
   RXF3reg.RXF3EID0 = 0x00;
- 800194c:	f88d 400f 	strb.w	r4, [sp, #15]
+ 800194a:	f88d 400f 	strb.w	r4, [sp, #15]
   
-  RXF4reg.RXF4SIDH = 0x00;
- 8001950:	f88d 4010 	strb.w	r4, [sp, #16]
-  RXF4reg.RXF4SIDL = 0x00;
- 8001954:	f88d 4011 	strb.w	r4, [sp, #17]
+  RXF4reg.RXF4SIDH = (filter4&0x7F8)>>3;
+ 800194e:	f88d 4010 	strb.w	r4, [sp, #16]
+  RXF4reg.RXF4SIDL = (filter4&0x7)<<5;
+ 8001952:	f88d 4011 	strb.w	r4, [sp, #17]
   RXF4reg.RXF4EID8 = 0x00;
- 8001958:	f88d 4012 	strb.w	r4, [sp, #18]
+ 8001956:	f88d 4012 	strb.w	r4, [sp, #18]
   RXF4reg.RXF4EID0 = 0x00;
- 800195c:	f88d 4013 	strb.w	r4, [sp, #19]
+ 800195a:	f88d 4013 	strb.w	r4, [sp, #19]
   
-  RXF5reg.RXF5SIDH = 0x00;
- 8001960:	f88d 4014 	strb.w	r4, [sp, #20]
-  RXF5reg.RXF5SIDL = 0x08;
- 8001964:	f88d 5015 	strb.w	r5, [sp, #21]
+  RXF5reg.RXF5SIDH = (filter5&0x7F8)>>3;
+ 800195e:	f88d 4014 	strb.w	r4, [sp, #20]
+  RXF5reg.RXF5SIDL = (filter5&0x7)<<5;
+ 8001962:	f88d 4015 	strb.w	r4, [sp, #21]
   RXF5reg.RXF5EID8 = 0x00;
- 8001968:	f88d 4016 	strb.w	r4, [sp, #22]
+ 8001966:	f88d 4016 	strb.w	r4, [sp, #22]
   RXF5reg.RXF5EID0 = 0x00;
- 800196c:	f88d 4017 	strb.w	r4, [sp, #23]
+ 800196a:	f88d 4017 	strb.w	r4, [sp, #23]
   
   /* Sjekk SPI-kommunikasjon status */
   if(!MCP2515_Initialize())
- 8001970:	f000 f8c4 	bl	8001afc <MCP2515_Initialize>
- 8001974:	b910      	cbnz	r0, 800197c <CANSPI_Initialize+0x94>
+ 800196e:	f000 f8c5 	bl	8001afc <MCP2515_Initialize>
+ 8001972:	b910      	cbnz	r0, 800197a <CANSPI_Initialize+0x92>
     return false;
- 8001976:	2000      	movs	r0, #0
+ 8001974:	2000      	movs	r0, #0
   /* Sjekk om normalmodus • */
   if(!MCP2515_SetNormalMode())
     return false;
   
   return true;
 }
- 8001978:	b009      	add	sp, #36	; 0x24
- 800197a:	bd30      	pop	{r4, r5, pc}
+ 8001976:	b008      	add	sp, #32
+ 8001978:	bd10      	pop	{r4, pc}
   if(!MCP2515_SetConfigMode())
- 800197c:	f000 f930 	bl	8001be0 <MCP2515_SetConfigMode>
- 8001980:	2800      	cmp	r0, #0
- 8001982:	d0f8      	beq.n	8001976 <CANSPI_Initialize+0x8e>
+ 800197a:	f000 f931 	bl	8001be0 <MCP2515_SetConfigMode>
+ 800197e:	2800      	cmp	r0, #0
+ 8001980:	d0f8      	beq.n	8001974 <CANSPI_Initialize+0x8c>
   MCP2515_WriteByteSequence(MCP2515_RXM0SIDH, MCP2515_RXM0EID0, &(RXM0reg.RXM0SIDH));
- 8001984:	aa06      	add	r2, sp, #24
- 8001986:	2123      	movs	r1, #35	; 0x23
- 8001988:	2020      	movs	r0, #32
- 800198a:	f000 f953 	bl	8001c34 <MCP2515_WriteByteSequence>
+ 8001982:	aa06      	add	r2, sp, #24
+ 8001984:	2123      	movs	r1, #35	; 0x23
+ 8001986:	2020      	movs	r0, #32
+ 8001988:	f000 f954 	bl	8001c34 <MCP2515_WriteByteSequence>
   MCP2515_WriteByteSequence(MCP2515_RXM1SIDH, MCP2515_RXM1EID0, &(RXM1reg.RXM1SIDH));
- 800198e:	aa07      	add	r2, sp, #28
- 8001990:	2127      	movs	r1, #39	; 0x27
- 8001992:	2024      	movs	r0, #36	; 0x24
- 8001994:	f000 f94e 	bl	8001c34 <MCP2515_WriteByteSequence>
+ 800198c:	aa07      	add	r2, sp, #28
+ 800198e:	2127      	movs	r1, #39	; 0x27
+ 8001990:	2024      	movs	r0, #36	; 0x24
+ 8001992:	f000 f94f 	bl	8001c34 <MCP2515_WriteByteSequence>
   MCP2515_WriteByteSequence(MCP2515_RXF0SIDH, MCP2515_RXF0EID0, &(RXF0reg.RXF0SIDH));
- 8001998:	466a      	mov	r2, sp
- 800199a:	2103      	movs	r1, #3
- 800199c:	4620      	mov	r0, r4
- 800199e:	f000 f949 	bl	8001c34 <MCP2515_WriteByteSequence>
+ 8001996:	466a      	mov	r2, sp
+ 8001998:	2103      	movs	r1, #3
+ 800199a:	4620      	mov	r0, r4
+ 800199c:	f000 f94a 	bl	8001c34 <MCP2515_WriteByteSequence>
   MCP2515_WriteByteSequence(MCP2515_RXF1SIDH, MCP2515_RXF1EID0, &(RXF1reg.RXF1SIDH));
- 80019a2:	aa01      	add	r2, sp, #4
- 80019a4:	2107      	movs	r1, #7
- 80019a6:	2004      	movs	r0, #4
- 80019a8:	f000 f944 	bl	8001c34 <MCP2515_WriteByteSequence>
+ 80019a0:	aa01      	add	r2, sp, #4
+ 80019a2:	2107      	movs	r1, #7
+ 80019a4:	2004      	movs	r0, #4
+ 80019a6:	f000 f945 	bl	8001c34 <MCP2515_WriteByteSequence>
   MCP2515_WriteByteSequence(MCP2515_RXF2SIDH, MCP2515_RXF2EID0, &(RXF2reg.RXF2SIDH));
- 80019ac:	aa02      	add	r2, sp, #8
- 80019ae:	210b      	movs	r1, #11
- 80019b0:	4628      	mov	r0, r5
- 80019b2:	f000 f93f 	bl	8001c34 <MCP2515_WriteByteSequence>
+ 80019aa:	aa02      	add	r2, sp, #8
+ 80019ac:	210b      	movs	r1, #11
+ 80019ae:	2008      	movs	r0, #8
+ 80019b0:	f000 f940 	bl	8001c34 <MCP2515_WriteByteSequence>
   MCP2515_WriteByteSequence(MCP2515_RXF3SIDH, MCP2515_RXF3EID0, &(RXF3reg.RXF3SIDH));
- 80019b6:	aa03      	add	r2, sp, #12
- 80019b8:	2113      	movs	r1, #19
- 80019ba:	2010      	movs	r0, #16
- 80019bc:	f000 f93a 	bl	8001c34 <MCP2515_WriteByteSequence>
+ 80019b4:	aa03      	add	r2, sp, #12
+ 80019b6:	2113      	movs	r1, #19
+ 80019b8:	2010      	movs	r0, #16
+ 80019ba:	f000 f93b 	bl	8001c34 <MCP2515_WriteByteSequence>
   MCP2515_WriteByteSequence(MCP2515_RXF4SIDH, MCP2515_RXF4EID0, &(RXF4reg.RXF4SIDH));
- 80019c0:	aa04      	add	r2, sp, #16
- 80019c2:	2117      	movs	r1, #23
- 80019c4:	2014      	movs	r0, #20
- 80019c6:	f000 f935 	bl	8001c34 <MCP2515_WriteByteSequence>
+ 80019be:	aa04      	add	r2, sp, #16
+ 80019c0:	2117      	movs	r1, #23
+ 80019c2:	2014      	movs	r0, #20
+ 80019c4:	f000 f936 	bl	8001c34 <MCP2515_WriteByteSequence>
   MCP2515_WriteByteSequence(MCP2515_RXF5SIDH, MCP2515_RXF5EID0, &(RXF5reg.RXF5SIDH));
- 80019ca:	aa05      	add	r2, sp, #20
- 80019cc:	211b      	movs	r1, #27
- 80019ce:	2018      	movs	r0, #24
- 80019d0:	f000 f930 	bl	8001c34 <MCP2515_WriteByteSequence>
+ 80019c8:	aa05      	add	r2, sp, #20
+ 80019ca:	211b      	movs	r1, #27
+ 80019cc:	2018      	movs	r0, #24
+ 80019ce:	f000 f931 	bl	8001c34 <MCP2515_WriteByteSequence>
   MCP2515_WriteByte(MCP2515_RXB0CTRL, 0x04);    //Enable BUKT, Accept Filter 0
- 80019d4:	2104      	movs	r1, #4
- 80019d6:	2060      	movs	r0, #96	; 0x60
- 80019d8:	f000 f8e4 	bl	8001ba4 <MCP2515_WriteByte>
+ 80019d2:	2104      	movs	r1, #4
+ 80019d4:	2060      	movs	r0, #96	; 0x60
+ 80019d6:	f000 f8e5 	bl	8001ba4 <MCP2515_WriteByte>
   MCP2515_WriteByte(MCP2515_RXB1CTRL, 0x01);    //Accept Filter 1
- 80019dc:	2101      	movs	r1, #1
- 80019de:	2070      	movs	r0, #112	; 0x70
- 80019e0:	f000 f8e0 	bl	8001ba4 <MCP2515_WriteByte>
+ 80019da:	2101      	movs	r1, #1
+ 80019dc:	2070      	movs	r0, #112	; 0x70
+ 80019de:	f000 f8e1 	bl	8001ba4 <MCP2515_WriteByte>
   MCP2515_WriteByte(MCP2515_CANINTE, 0x03);		//Enable interrupt on RXB0/RXB1
- 80019e4:	2103      	movs	r1, #3
- 80019e6:	202b      	movs	r0, #43	; 0x2b
- 80019e8:	f000 f8dc 	bl	8001ba4 <MCP2515_WriteByte>
+ 80019e2:	2103      	movs	r1, #3
+ 80019e4:	202b      	movs	r0, #43	; 0x2b
+ 80019e6:	f000 f8dd 	bl	8001ba4 <MCP2515_WriteByte>
   MCP2515_WriteByte(MCP2515_CNF1, 0x00);
- 80019ec:	4621      	mov	r1, r4
- 80019ee:	202a      	movs	r0, #42	; 0x2a
- 80019f0:	f000 f8d8 	bl	8001ba4 <MCP2515_WriteByte>
+ 80019ea:	4621      	mov	r1, r4
+ 80019ec:	202a      	movs	r0, #42	; 0x2a
+ 80019ee:	f000 f8d9 	bl	8001ba4 <MCP2515_WriteByte>
   MCP2515_WriteByte(MCP2515_CNF2, 0xE0);
- 80019f4:	21e0      	movs	r1, #224	; 0xe0
- 80019f6:	2029      	movs	r0, #41	; 0x29
- 80019f8:	f000 f8d4 	bl	8001ba4 <MCP2515_WriteByte>
+ 80019f2:	21e0      	movs	r1, #224	; 0xe0
+ 80019f4:	2029      	movs	r0, #41	; 0x29
+ 80019f6:	f000 f8d5 	bl	8001ba4 <MCP2515_WriteByte>
   MCP2515_WriteByte(MCP2515_CNF3, 0x82);
- 80019fc:	2182      	movs	r1, #130	; 0x82
- 80019fe:	2028      	movs	r0, #40	; 0x28
- 8001a00:	f000 f8d0 	bl	8001ba4 <MCP2515_WriteByte>
+ 80019fa:	2182      	movs	r1, #130	; 0x82
+ 80019fc:	2028      	movs	r0, #40	; 0x28
+ 80019fe:	f000 f8d1 	bl	8001ba4 <MCP2515_WriteByte>
   if(!MCP2515_SetNormalMode())
- 8001a04:	f000 f901 	bl	8001c0a <MCP2515_SetNormalMode>
+ 8001a02:	f000 f902 	bl	8001c0a <MCP2515_SetNormalMode>
     return false;
- 8001a08:	3000      	adds	r0, #0
- 8001a0a:	bf18      	it	ne
- 8001a0c:	2001      	movne	r0, #1
- 8001a0e:	e7b3      	b.n	8001978 <CANSPI_Initialize+0x90>
+ 8001a06:	3000      	adds	r0, #0
+ 8001a08:	bf18      	it	ne
+ 8001a0a:	2001      	movne	r0, #1
+ 8001a0c:	e7b3      	b.n	8001976 <CANSPI_Initialize+0x8e>
 
-08001a10 <CANSPI_Receive>:
+08001a0e <CANSPI_Receive>:
   return (returnValue);
 }
 
 /* CAN motta data */
 uint8_t CANSPI_Receive(uCAN_MSG *tempCanMsg) 
 {
- 8001a10:	b530      	push	{r4, r5, lr}
- 8001a12:	b085      	sub	sp, #20
- 8001a14:	4604      	mov	r4, r0
+ 8001a0e:	b530      	push	{r4, r5, lr}
+ 8001a10:	b085      	sub	sp, #20
+ 8001a12:	4604      	mov	r4, r0
   uint8_t returnValue = 0;
   rx_reg_t rxReg;
   ctrl_rx_status_t rxStatus;
   
   rxStatus.ctrl_rx_status = MCP2515_GetRxStatus();
- 8001a16:	f000 f933 	bl	8001c80 <MCP2515_GetRxStatus>
- 8001a1a:	4605      	mov	r5, r0
+ 8001a14:	f000 f934 	bl	8001c80 <MCP2515_GetRxStatus>
+ 8001a18:	4605      	mov	r5, r0
   
   /* Sjekk om data i RxBuffer */
   if (rxStatus.rxBuffer != 0)
- 8001a1c:	f010 00c0 	ands.w	r0, r0, #192	; 0xc0
- 8001a20:	d040      	beq.n	8001aa4 <CANSPI_Receive+0x94>
+ 8001a1a:	f010 00c0 	ands.w	r0, r0, #192	; 0xc0
+ 8001a1e:	d040      	beq.n	8001aa2 <CANSPI_Receive+0x94>
   {
     /* Sjekk hvilket buffer data ligger i */
     if ((rxStatus.rxBuffer == MSG_IN_RXB0)|(rxStatus.rxBuffer == MSG_IN_BOTH_BUFFERS))
- 8001a22:	066b      	lsls	r3, r5, #25
- 8001a24:	d540      	bpl.n	8001aa8 <CANSPI_Receive+0x98>
+ 8001a20:	066b      	lsls	r3, r5, #25
+ 8001a22:	d540      	bpl.n	8001aa6 <CANSPI_Receive+0x98>
     {
       MCP2515_ReadRxSequence(MCP2515_READ_RXB0SIDH, rxReg.rx_reg_array, sizeof(rxReg.rx_reg_array));
- 8001a26:	220d      	movs	r2, #13
- 8001a28:	4669      	mov	r1, sp
- 8001a2a:	2090      	movs	r0, #144	; 0x90
+ 8001a24:	220d      	movs	r2, #13
+ 8001a26:	4669      	mov	r1, sp
+ 8001a28:	2090      	movs	r0, #144	; 0x90
     }
     else if (rxStatus.rxBuffer == MSG_IN_RXB1)
     {
       MCP2515_ReadRxSequence(MCP2515_READ_RXB1SIDH, rxReg.rx_reg_array, sizeof(rxReg.rx_reg_array));
- 8001a2c:	f000 f89a 	bl	8001b64 <MCP2515_ReadRxSequence>
+ 8001a2a:	f000 f89b 	bl	8001b64 <MCP2515_ReadRxSequence>
     }
     
     /* Extended type */
     if (rxStatus.msgType == dEXTENDED_CAN_MSG_ID_2_0B)
- 8001a30:	f005 0518 	and.w	r5, r5, #24
- 8001a34:	2d10      	cmp	r5, #16
- 8001a36:	f89d 3001 	ldrb.w	r3, [sp, #1]
- 8001a3a:	f89d 1000 	ldrb.w	r1, [sp]
- 8001a3e:	d139      	bne.n	8001ab4 <CANSPI_Receive+0xa4>
+ 8001a2e:	f005 0518 	and.w	r5, r5, #24
+ 8001a32:	2d10      	cmp	r5, #16
+ 8001a34:	f89d 3001 	ldrb.w	r3, [sp, #1]
+ 8001a38:	f89d 1000 	ldrb.w	r1, [sp]
+ 8001a3c:	d139      	bne.n	8001ab2 <CANSPI_Receive+0xa4>
     {
       tempCanMsg->frame.idType = (uint8_t) dEXTENDED_CAN_MSG_ID_2_0B;
- 8001a40:	2202      	movs	r2, #2
- 8001a42:	7022      	strb	r2, [r4, #0]
+ 8001a3e:	2202      	movs	r2, #2
+ 8001a40:	7022      	strb	r2, [r4, #0]
   uint8_t CAN_standardLo_ID_hi3bits;
   
   CAN_standardLo_ID_lo2bits = (tempRXBn_SIDL & 0x03);
   CAN_standardLo_ID_hi3bits = (tempRXBn_SIDL >> 5);
   ConvertedID = (tempRXBn_SIDH << 3);
   ConvertedID = ConvertedID + CAN_standardLo_ID_hi3bits;
- 8001a44:	095a      	lsrs	r2, r3, #5
- 8001a46:	eb02 02c1 	add.w	r2, r2, r1, lsl #3
+ 8001a42:	095a      	lsrs	r2, r3, #5
+ 8001a44:	eb02 02c1 	add.w	r2, r2, r1, lsl #3
   ConvertedID = (ConvertedID << 2);
   ConvertedID = ConvertedID + CAN_standardLo_ID_lo2bits;
- 8001a4a:	f003 0303 	and.w	r3, r3, #3
- 8001a4e:	eb03 0382 	add.w	r3, r3, r2, lsl #2
+ 8001a48:	f003 0303 	and.w	r3, r3, #3
+ 8001a4c:	eb03 0382 	add.w	r3, r3, r2, lsl #2
   ConvertedID = (ConvertedID << 8);
   ConvertedID = ConvertedID + tempRXBn_EIDH;
- 8001a52:	f89d 2002 	ldrb.w	r2, [sp, #2]
- 8001a56:	eb02 2203 	add.w	r2, r2, r3, lsl #8
+ 8001a50:	f89d 2002 	ldrb.w	r2, [sp, #2]
+ 8001a54:	eb02 2203 	add.w	r2, r2, r3, lsl #8
   ConvertedID = (ConvertedID << 8);
   ConvertedID = ConvertedID + tempRXBn_EIDL;
- 8001a5a:	f89d 3003 	ldrb.w	r3, [sp, #3]
- 8001a5e:	eb03 2302 	add.w	r3, r3, r2, lsl #8
+ 8001a58:	f89d 3003 	ldrb.w	r3, [sp, #3]
+ 8001a5c:	eb03 2302 	add.w	r3, r3, r2, lsl #8
       tempCanMsg->frame.id = convertReg2StandardCANid(rxReg.RXBnSIDH, rxReg.RXBnSIDL);
- 8001a62:	6063      	str	r3, [r4, #4]
+ 8001a60:	6063      	str	r3, [r4, #4]
     tempCanMsg->frame.dlc   = rxReg.RXBnDLC;
- 8001a64:	f89d 3004 	ldrb.w	r3, [sp, #4]
- 8001a68:	7223      	strb	r3, [r4, #8]
+ 8001a62:	f89d 3004 	ldrb.w	r3, [sp, #4]
+ 8001a66:	7223      	strb	r3, [r4, #8]
     tempCanMsg->frame.data0 = rxReg.RXBnD0;
- 8001a6a:	f89d 3005 	ldrb.w	r3, [sp, #5]
- 8001a6e:	7263      	strb	r3, [r4, #9]
+ 8001a68:	f89d 3005 	ldrb.w	r3, [sp, #5]
+ 8001a6c:	7263      	strb	r3, [r4, #9]
     tempCanMsg->frame.data1 = rxReg.RXBnD1;
- 8001a70:	f89d 3006 	ldrb.w	r3, [sp, #6]
- 8001a74:	72a3      	strb	r3, [r4, #10]
+ 8001a6e:	f89d 3006 	ldrb.w	r3, [sp, #6]
+ 8001a72:	72a3      	strb	r3, [r4, #10]
     tempCanMsg->frame.data2 = rxReg.RXBnD2;
- 8001a76:	f89d 3007 	ldrb.w	r3, [sp, #7]
- 8001a7a:	72e3      	strb	r3, [r4, #11]
+ 8001a74:	f89d 3007 	ldrb.w	r3, [sp, #7]
+ 8001a78:	72e3      	strb	r3, [r4, #11]
     tempCanMsg->frame.data3 = rxReg.RXBnD3;
- 8001a7c:	f89d 3008 	ldrb.w	r3, [sp, #8]
- 8001a80:	7323      	strb	r3, [r4, #12]
+ 8001a7a:	f89d 3008 	ldrb.w	r3, [sp, #8]
+ 8001a7e:	7323      	strb	r3, [r4, #12]
     tempCanMsg->frame.data4 = rxReg.RXBnD4;
- 8001a82:	f89d 3009 	ldrb.w	r3, [sp, #9]
- 8001a86:	7363      	strb	r3, [r4, #13]
+ 8001a80:	f89d 3009 	ldrb.w	r3, [sp, #9]
+ 8001a84:	7363      	strb	r3, [r4, #13]
     tempCanMsg->frame.data5 = rxReg.RXBnD5;
- 8001a88:	f89d 300a 	ldrb.w	r3, [sp, #10]
- 8001a8c:	73a3      	strb	r3, [r4, #14]
+ 8001a86:	f89d 300a 	ldrb.w	r3, [sp, #10]
+ 8001a8a:	73a3      	strb	r3, [r4, #14]
     tempCanMsg->frame.data6 = rxReg.RXBnD6;
- 8001a8e:	f89d 300b 	ldrb.w	r3, [sp, #11]
- 8001a92:	73e3      	strb	r3, [r4, #15]
+ 8001a8c:	f89d 300b 	ldrb.w	r3, [sp, #11]
+ 8001a90:	73e3      	strb	r3, [r4, #15]
     tempCanMsg->frame.data7 = rxReg.RXBnD7;
- 8001a94:	f89d 300c 	ldrb.w	r3, [sp, #12]
- 8001a98:	7423      	strb	r3, [r4, #16]
+ 8001a92:	f89d 300c 	ldrb.w	r3, [sp, #12]
+ 8001a96:	7423      	strb	r3, [r4, #16]
     MCP2515_WriteByte(MCP2515_CANINTF,0x00); // Resetter flagg
- 8001a9a:	202c      	movs	r0, #44	; 0x2c
- 8001a9c:	2100      	movs	r1, #0
- 8001a9e:	f000 f881 	bl	8001ba4 <MCP2515_WriteByte>
+ 8001a98:	202c      	movs	r0, #44	; 0x2c
+ 8001a9a:	2100      	movs	r1, #0
+ 8001a9c:	f000 f882 	bl	8001ba4 <MCP2515_WriteByte>
     returnValue = 1;
- 8001aa2:	2001      	movs	r0, #1
+ 8001aa0:	2001      	movs	r0, #1
 }
- 8001aa4:	b005      	add	sp, #20
- 8001aa6:	bd30      	pop	{r4, r5, pc}
+ 8001aa2:	b005      	add	sp, #20
+ 8001aa4:	bd30      	pop	{r4, r5, pc}
     else if (rxStatus.rxBuffer == MSG_IN_RXB1)
- 8001aa8:	2880      	cmp	r0, #128	; 0x80
- 8001aaa:	d1c1      	bne.n	8001a30 <CANSPI_Receive+0x20>
+ 8001aa6:	2880      	cmp	r0, #128	; 0x80
+ 8001aa8:	d1c1      	bne.n	8001a2e <CANSPI_Receive+0x20>
       MCP2515_ReadRxSequence(MCP2515_READ_RXB1SIDH, rxReg.rx_reg_array, sizeof(rxReg.rx_reg_array));
- 8001aac:	220d      	movs	r2, #13
- 8001aae:	4669      	mov	r1, sp
- 8001ab0:	2094      	movs	r0, #148	; 0x94
- 8001ab2:	e7bb      	b.n	8001a2c <CANSPI_Receive+0x1c>
+ 8001aaa:	220d      	movs	r2, #13
+ 8001aac:	4669      	mov	r1, sp
+ 8001aae:	2094      	movs	r0, #148	; 0x94
+ 8001ab0:	e7bb      	b.n	8001a2a <CANSPI_Receive+0x1c>
       tempCanMsg->frame.idType = (uint8_t) dSTANDARD_CAN_MSG_ID_2_0B;
- 8001ab4:	2201      	movs	r2, #1
+ 8001ab2:	2201      	movs	r2, #1
 {
   uint32_t returnValue = 0;
   uint32_t ConvertedID;
   
   ConvertedID = (tempRXBn_SIDH << 3);
   ConvertedID = ConvertedID + (tempRXBn_SIDL >> 5);
- 8001ab6:	095b      	lsrs	r3, r3, #5
+ 8001ab4:	095b      	lsrs	r3, r3, #5
       tempCanMsg->frame.idType = (uint8_t) dSTANDARD_CAN_MSG_ID_2_0B;
- 8001ab8:	7022      	strb	r2, [r4, #0]
+ 8001ab6:	7022      	strb	r2, [r4, #0]
   ConvertedID = ConvertedID + (tempRXBn_SIDL >> 5);
- 8001aba:	eb03 03c1 	add.w	r3, r3, r1, lsl #3
- 8001abe:	e7d0      	b.n	8001a62 <CANSPI_Receive+0x52>
+ 8001ab8:	eb03 03c1 	add.w	r3, r3, r1, lsl #3
+ 8001abc:	e7d0      	b.n	8001a60 <CANSPI_Receive+0x52>
+	...
 
 08001ac0 <SPI_Tx>:
   MCP2515_CS_HIGH();
@@ -3920,7 +3917,7 @@ static void SPI_Tx(uint8_t data)
 }
  8001ad2:	b003      	add	sp, #12
  8001ad4:	f85d fb04 	ldr.w	pc, [sp], #4
- 8001ad8:	20000060 	.word	0x20000060
+ 8001ad8:	20000024 	.word	0x20000024
 
 08001adc <SPI_Rx>:
   HAL_SPI_Transmit(SPI_CAN, buffer, length, SPI_TIMEOUT);    
@@ -3943,7 +3940,7 @@ static uint8_t SPI_Rx(void)
  8001af0:	b003      	add	sp, #12
  8001af2:	f85d fb04 	ldr.w	pc, [sp], #4
  8001af6:	bf00      	nop
- 8001af8:	20000060 	.word	0x20000060
+ 8001af8:	20000024 	.word	0x20000024
 
 08001afc <MCP2515_Initialize>:
 {
@@ -3971,7 +3968,7 @@ static uint8_t SPI_Rx(void)
 }
  8001b22:	bd38      	pop	{r3, r4, r5, pc}
  8001b24:	40021000 	.word	0x40021000
- 8001b28:	20000060 	.word	0x20000060
+ 8001b28:	20000024 	.word	0x20000024
 
 08001b2c <MCP2515_ReadByte>:
 {
@@ -4042,7 +4039,7 @@ static void SPI_RxBuffer(uint8_t *buffer, uint8_t length)
   MCP2515_CS_HIGH();
  8001b98:	f7fe be84 	b.w	80008a4 <HAL_GPIO_WritePin>
  8001b9c:	40021000 	.word	0x40021000
- 8001ba0:	20000060 	.word	0x20000060
+ 8001ba0:	20000024 	.word	0x20000024
 
 08001ba4 <MCP2515_WriteByte>:
 {    
@@ -4168,7 +4165,7 @@ static void SPI_RxBuffer(uint8_t *buffer, uint8_t length)
  8001c72:	f7fe be17 	b.w	80008a4 <HAL_GPIO_WritePin>
  8001c76:	bf00      	nop
  8001c78:	40021000 	.word	0x40021000
- 8001c7c:	20000060 	.word	0x20000060
+ 8001c7c:	20000024 	.word	0x20000024
 
 08001c80 <MCP2515_GetRxStatus>:
 {
@@ -4638,9 +4635,9 @@ void SystemClock_Config(void)
  8001f14:	40020000 	.word	0x40020000
  8001f18:	40021000 	.word	0x40021000
  8001f1c:	10210000 	.word	0x10210000
- 8001f20:	20000060 	.word	0x20000060
+ 8001f20:	20000024 	.word	0x20000024
  8001f24:	40003c00 	.word	0x40003c00
- 8001f28:	20000024 	.word	0x20000024
+ 8001f28:	20000088 	.word	0x20000088
  8001f2c:	40000800 	.word	0x40000800
 
 08001f30 <PWM_Set_Frekvens>:
@@ -4983,7 +4980,7 @@ void EXTI15_10_IRQHandler(void)
 //	    }
 	if(CANSPI_Receive(&rxMessage))
  80020b4:	a801      	add	r0, sp, #4
- 80020b6:	f7ff fcab 	bl	8001a10 <CANSPI_Receive>
+ 80020b6:	f7ff fcaa 	bl	8001a0e <CANSPI_Receive>
  80020ba:	b1d0      	cbz	r0, 80020f2 <EXTI15_10_IRQHandler+0x42>
 	    {
 		retning = (rxMessage.frame.data0>>7)&0x1;
@@ -5053,7 +5050,7 @@ void EXTI15_10_IRQHandler(void)
  800211e:	b280      	uxth	r0, r0
  8002120:	e7e5      	b.n	80020ee <EXTI15_10_IRQHandler+0x3e>
  8002122:	bf00      	nop
- 8002124:	20000024 	.word	0x20000024
+ 8002124:	20000088 	.word	0x20000088
  8002128:	40021000 	.word	0x40021000
 
 0800212c <SystemInit>:
@@ -5203,7 +5200,7 @@ LoopFillZerobss:
   ldr  r2, =_sbss
  80021c0:	20000004 	.word	0x20000004
   ldr  r3, = _ebss
- 80021c4:	200000e4 	.word	0x200000e4
+ 80021c4:	200000f0 	.word	0x200000f0
 
 080021c8 <ADC_IRQHandler>:
  * @retval None       
