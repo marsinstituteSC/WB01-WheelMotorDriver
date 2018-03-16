@@ -41,6 +41,7 @@
 #include "stm32f4xx_hal.h"
 
 /* USER CODE BEGIN Includes */
+#include "oppsett.h"
 
 TIM_HandleTypeDef htim4;
 #include "CANSPI.h"
@@ -51,7 +52,7 @@ TIM_HandleTypeDef htim4;
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi3;
+SPI_HandleTypeDef hSPICAN;
 TIM_HandleTypeDef htim4;
 
 
@@ -66,7 +67,7 @@ uint16_t periode;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_SPI3_Init(void);
+static void MX_SPICAN_Init(void);
 static void MX_TIM4_Init(void);
                                     
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
@@ -106,7 +107,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI3_Init();
+  MX_SPICAN_Init();
   MX_TIM4_Init();
 
   /* USER CODE BEGIN 2 */
@@ -230,23 +231,23 @@ void SystemClock_Config(void)
 }
 
 /* SPI3 init function */
-static void MX_SPI3_Init(void)
+static void MX_SPICAN_Init(void)
 {
 
   /* SPI3 parameter configuration*/
-  hspi3.Instance = SPI3;
-  hspi3.Init.Mode = SPI_MODE_MASTER;
-  hspi3.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi3.Init.NSS = SPI_NSS_SOFT;
-  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
-  hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi3.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi3) != HAL_OK)
+  hSPICAN.Instance = MBSPI;
+  hSPICAN.Init.Mode = SPI_MODE_MASTER;
+  hSPICAN.Init.Direction = SPI_DIRECTION_2LINES;
+  hSPICAN.Init.DataSize = SPI_DATASIZE_8BIT;
+  hSPICAN.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hSPICAN.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hSPICAN.Init.NSS = SPI_NSS_SOFT;
+  hSPICAN.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hSPICAN.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hSPICAN.Init.TIMode = SPI_TIMODE_DISABLE;
+  hSPICAN.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hSPICAN.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hSPICAN) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
