@@ -34,8 +34,6 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
-#include "MCP2515.h"
-#include "CANSPI.h"
 
 /* USER CODE BEGIN 0 */
 

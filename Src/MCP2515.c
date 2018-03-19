@@ -3,12 +3,12 @@
 #include "spi.h"
 
 /* Modify below items for your SPI configurations */
-//#ifdef canModulMB1
+#ifdef canModulMB1
 #define SPI_CAN                 &hspi3
-//#endif
-//#ifdef canModulMB2
-//#define SPI_CAN                 &hspi2
-//#endif
+#endif
+#ifdef canModulMB2
+#define SPI_CAN                 &hspi2
+#endif
 
 
 #define SPI_TIMEOUT             10
