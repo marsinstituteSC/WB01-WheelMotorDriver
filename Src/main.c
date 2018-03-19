@@ -44,7 +44,6 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-#include "oppsett.h"
 
 TIM_HandleTypeDef htim4;
 #include "CANSPI.h"
@@ -102,16 +101,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI3_Init();
-  MX_TIM4_Init();
+
+//  MX_TIM4_Init();
 
   /* USER CODE BEGIN 2 */
 	CANSPI_Initialize();
 //	TIM2->CCMR2 = 0x6800;
-	HAL_TIM_Base_Start(&htim4);
-	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
-	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
-	uint16_t fart = 32000;
-	bool retn = 0;
+//	HAL_TIM_Base_Start(&htim4);
+//	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
+//	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
+//	uint16_t fart = 32000;
+//	bool retn = 0;
 
 
   /* USER CODE END 2 */
@@ -119,50 +119,23 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
+
+		txMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+		txMessage.frame.id = 0x0A;
+		txMessage.frame.dlc = 8;
+		txMessage.frame.data0 = 0xFF;
+		txMessage.frame.data1 = 0xFF;
+		txMessage.frame.data2 = 0xFF;
+		txMessage.frame.data3 = 0xFF;
+		txMessage.frame.data4 = 0xFF;
+		txMessage.frame.data5 = 0xFF;
+		txMessage.frame.data6 = 0xFF;
+		txMessage.frame.data7 = 0xFF;
+		CANSPI_Transmit(&txMessage);
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
 
-//		if(HAL_GPIO_ReadPin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin)){
-//
-//			if(fart >= 32768){retn = 0;}
-//			if(fart <= 100){retn = 1;}
-//			if(fart >= 32768){fart = 32768;}
-//			if(fart <= 100 ){fart = 100;}
-//
-//			PWM_Set_Frekvens(fart);
-//			HAL_Delay(1);
-//
-//			if(retn == 0){fart = fart-10;}
-//			if(retn == 1){fart = fart+10;}
-//		}
-
-//		if(CANSPI_Receive(&rxMessage))
-//		    {
-////			if((rxMessage.frame.data0-rxMessage.frame.data1)<= 0){
-////				MOTOR_BAK();
-////			}else{
-////				MOTOR_FRAM();
-////			}
-//			if(rxMessage.frame.data0==0){
-//				PWM_Set_Frekvens(0);
-//			}
-//		    PWM_Set_Frekvens(rxMessage.frame.data0);
-//		    }
-//		txMessage.frame.idType = dEXTENDED_CAN_MSG_ID_2_0B;
-//		txMessage.frame.id = 0x0A;
-//		txMessage.frame.dlc = 8;
-//		txMessage.frame.data0 = 0x00;
-//		txMessage.frame.data1 = 0x00;
-//		txMessage.frame.data2 = 0x00;
-//		txMessage.frame.data3 = 0x00;
-//		txMessage.frame.data4 = 0x00;
-//		txMessage.frame.data5 = 0x00;
-//		txMessage.frame.data6 = 0x00;
-//		txMessage.frame.data7 = 0x00;
-//		CANSPI_Transmit(&txMessage);
-//
-//		HAL_Delay(1000);
 
 	}
   /* USER CODE END 3 */

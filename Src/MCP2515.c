@@ -1,7 +1,16 @@
 #include "MCP2515.h"
 #include "oppsett.h"
+#include "spi.h"
 
 /* Modify below items for your SPI configurations */
+#ifdef canModulMB1
+#define SPI_CAN                 &hspi3
+#endif
+#ifdef canModulMB2
+#define SPI_CAN                 &hspi2
+#endif
+
+
 #define SPI_TIMEOUT             10
 #define MCP2515_CS_HIGH()   HAL_GPIO_WritePin(CAN_CS_GPIO_Port, CAN_CS_Pin, GPIO_PIN_SET)
 #define MCP2515_CS_LOW()    HAL_GPIO_WritePin(CAN_CS_GPIO_Port, CAN_CS_Pin, GPIO_PIN_RESET)
