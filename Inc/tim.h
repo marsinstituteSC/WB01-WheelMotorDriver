@@ -48,19 +48,22 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
+#ifdef adapterModulMB2
+extern TIM_HandleTypeDef htim4;
+#define PWM_TIM &htim4
+#define PWM_TIM_REG TIM4
+#endif
+
+#ifdef adapterModulMB1
+extern TIM_HandleTypeDef htim1;
+#define PWM_TIM &htim1
+#define PWM_TIM_REG TIM1
+#endif
 
 /* USER CODE END Includes */
- extern TIM_HandleTypeDef htim4;
-//#ifdef adapterModulMB2
-//extern TIM_HandleTypeDef htim4;
-//#define PWM_TIM &htim4
-//#define PWM_TIM_REG TIM4
-//#endif
-//#ifdef adapterModulMB1
-//extern TIM_HandleTypeDef htim1;
-//#define PWM_TIM &htim1
-//#define PWM_TIM_REG TIM1
-//#endif
+
+
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
