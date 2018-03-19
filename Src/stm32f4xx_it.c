@@ -34,6 +34,8 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
+#include "MCP2515.h"
+#include "CANSPI.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -108,30 +110,29 @@ void EXTI15_10_IRQHandler(void)
 //		}
 //	    PWM_Set_Frekvens(rxMessage.frame.data0);
 //	    }
-	if(CANSPI_Receive(&rxMessage))
-	    {
-		retning = (rxMessage.frame.data0>>7)&0x1;
-		fart = ((rxMessage.frame.data0<<8)+rxMessage.frame.data1);
-		if((fart>=1)){
-//			MOTOR_FRAM();
-			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_SET);
-			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
-			PWM_Set_Frekvens(fart);
-		}
-		else if((fart<=-1)){
-			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_RESET);
-			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
-			PWM_Set_Frekvens(-fart);
-		}
-		else{PWM_Set_Frekvens(0);}
-//		if((rxMessage.frame.data0==0) & (rxMessage.frame.data1==0)){
-//			PWM_Set_Frekvens(0);
+//	if(CANSPI_Receive(&rxMessage))
+//	    {
+//		retning = (rxMessage.frame.data0>>7)&0x1;
+//		fart = ((rxMessage.frame.data0<<8)+rxMessage.frame.data1);
+//		if((fart>=1)){
+////			MOTOR_FRAM();
+//			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+//			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_SET);
+//			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
+//			PWM_Set_Frekvens(fart);
 //		}
+//		else if((fart<=-1)){
+//			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
+//			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_RESET);
+//			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
+//			PWM_Set_Frekvens(-fart);
+//		}
+//		else{PWM_Set_Frekvens(0);}
+////		if((rxMessage.frame.data0==0) & (rxMessage.frame.data1==0)){
+////			PWM_Set_Frekvens(0);
+////		}
+	// }
 
-
-	    }
 
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);

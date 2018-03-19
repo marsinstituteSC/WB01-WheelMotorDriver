@@ -50,8 +50,12 @@
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
-
+#ifdef canModulMB1
 extern SPI_HandleTypeDef hspi3;
+#endif
+#ifdef canModulMB2
+extern SPI_HandleTypeDef hspi2;
+#endif
 
 /* USER CODE BEGIN Private defines */
 
