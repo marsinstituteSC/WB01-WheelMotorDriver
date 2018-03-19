@@ -34,8 +34,6 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
-#include "CANSPI.h"
-#include "motorDriver.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -100,10 +98,6 @@ void SysTick_Handler(void)
 */
 void EXTI15_10_IRQHandler(void)
 {
-
-	uCAN_MSG rxMessage;
-	int16_t fart;
-	uint8_t retning;
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 
 //	if(CANSPI_Receive(&rxMessage))
