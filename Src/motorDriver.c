@@ -1,6 +1,6 @@
 #include "motorDriver.h"
 #include "main.h"
-#include <math.h>
+#include "tim.h"
 
 void PWM_Set_Frekvens(uint16_t tempfart){
 
