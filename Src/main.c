@@ -48,7 +48,7 @@
 #include "motorDriver.h"
 #include "stdio.h"
 #include "stdlib.h"
-TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim1;
 
 /* USER CODE END Includes */
 
