@@ -3,8 +3,8 @@
 
 #include "stm32f4xx_hal.h"
 
-#define canModulMB2
-#define adapterModulMB1
+#define canModulMB1
+#define adapterModulMB2
 
 
 #define mask0 0x000
@@ -50,6 +50,8 @@
 #define DRIVE_DIR_GPIO_Port GPIOE
 #define DRIVE_PWM_Pin GPIO_PIN_9
 #define DRIVE_PWM_GPIO_Port GPIOE
+#define DRIVE_PWM2_Pin GPIO_PIN_9
+#define DRIVE_PWM2_GPIO_Port GPIOE
 
 #endif
 

@@ -101,12 +101,13 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI3_Init();
   MX_TIM4_Init();
+//  MX_TIM1_Init();
 
   /* USER CODE BEGIN 2 */
 	CANSPI_Initialize();
 //	TIM4->CCMR2 = 0x6800;
-	HAL_TIM_Base_Start(&htim1);
-	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+	HAL_TIM_Base_Start(&htim4);
+	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
 	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
 	uint16_t fart = 32000;
 	bool retn = 0;
