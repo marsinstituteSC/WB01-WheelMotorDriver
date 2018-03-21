@@ -2,6 +2,10 @@
 #include "main.h"
 #include "tim.h"
 
+
+
+
+
 void PWM_Set_Frekvens(uint16_t tempfart){
 
 //	bool retning = (tempfart>>15) & 0x01;

@@ -2,6 +2,7 @@
 #define OPPSETT_H_
 
 #include "stm32f4xx_hal.h"
+#include "motorDriver.h"
 
 #define canModulMB1
 #define adapterModulMB2
@@ -12,6 +13,7 @@
 
 #define filter0 0x000
 #define filter1 0x000
+
 
 
 #define filter2 0x000
