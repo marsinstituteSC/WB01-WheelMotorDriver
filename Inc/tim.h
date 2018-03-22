@@ -48,22 +48,10 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-#ifdef adapterModulMB2
-extern TIM_HandleTypeDef htim4;
-#define PWM_TIM &htim4
-#define PWM_TIM_REG TIM4
-#endif
-
-#ifdef adapterModulMB1
-extern TIM_HandleTypeDef htim1;
-#define PWM_TIM &htim1
-#define PWM_TIM_REG TIM1
-#endif
 
 /* USER CODE END Includes */
 
-extern TIM_HandleTypeDef htim1;
-extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef htim;
 
 /* USER CODE BEGIN Private defines */
 
@@ -71,9 +59,7 @@ extern TIM_HandleTypeDef htim4;
 
 extern void _Error_Handler(char *, int);
 
-void MX_TIM1_Init(void);
-void MX_TIM4_Init(void);
-                    
+void TIMER_Init(void);
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                                 
 

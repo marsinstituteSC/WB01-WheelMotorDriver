@@ -79,16 +79,6 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 
-	MotorSetting Motor;
-	Motor.oppsett.mikrobus = 1;
-	Motor.oppsett.driveFilter = 0x251;
-	Motor.oppsett.startByte = 2;
-	Motor.oppsett.antallBytes = 2;
-	Motor.oppsett.pulseRev = 40000;
-	Motor.oppsett.revPerSekund = 50;
-	Motor.oppsett.unsignedsigned = 1;
-	Motor.oppsett.gpiomode = 1;
-
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -110,16 +100,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI3_Init();
-  MX_TIM4_Init();
-  MX_TIM1_Init();
+  TIMER_Init();
 
   /* USER CODE BEGIN 2 */
 	CANSPI_Initialize();
 //	TIM4->CCMR2 = 0x6800;
-	HAL_TIM_Base_Start(&htim4);
-	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
-	HAL_GPIO_WritePin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin,GPIO_PIN_SET);
-	uint16_t fart = 32000;
+
 	bool retn = 0;
 	PWM_Set_Frekvens(32000);
 
@@ -130,30 +116,30 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1) {
 
-		switch (rxMessage.frame.id) {
-			case 0x300:
+//		switch (rxMessage.frame.id) {
+//			case 0x300:
+//
+//			case 0x000:
+//
+//			case 0x000:
+//
+//				break;
+//			default:
+//				break;
+//		}
 
-			case 0x000:
-
-			case 0x000:
-
-				break;
-			default:
-				break;
-		}
-
-//		txMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-//		txMessage.frame.id = 0x0A;
-//		txMessage.frame.dlc = 8;
-//		txMessage.frame.data0 = 0xFF;
-//		txMessage.frame.data1 = 0xFF;
-//		txMessage.frame.data2 = 0xFF;
-//		txMessage.frame.data3 = 0xFF;
-//		txMessage.frame.data4 = 0xFF;
-//		txMessage.frame.data5 = 0xFF;
-//		txMessage.frame.data6 = 0xFF;
-//		txMessage.frame.data7 = 0xFF;
-//		CANSPI_Transmit(&txMessage);
+		txMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+		txMessage.frame.id = 0x0A;
+		txMessage.frame.dlc = 8;
+		txMessage.frame.data0 = 0xFF;
+		txMessage.frame.data1 = 0xFF;
+		txMessage.frame.data2 = 0xFF;
+		txMessage.frame.data3 = 0xFF;
+		txMessage.frame.data4 = 0xFF;
+		txMessage.frame.data5 = 0xFF;
+		txMessage.frame.data6 = 0xFF;
+		txMessage.frame.data7 = 0xFF;
+		CANSPI_Transmit(&txMessage);
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */

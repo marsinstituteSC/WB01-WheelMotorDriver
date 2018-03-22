@@ -24,16 +24,16 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 		if (tempfart <=55){tempfart = 55;}
 		if (tempfart >= 65000){tempfart = 65000;}
 
-		TIM4->ARR = tempfart;
-		TIM4->CCR1 = (tempfart/2);
-		TIM4->CR1 = 0x81;
+		PWM_TIMER->ARR = tempfart;
+		PWM_TIMER->CCR1 = (tempfart/2);
+		PWM_TIMER->CR1 = 0x81;
 //		HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
 	}else{
 //		HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
 //		MOTOR_DISABLE()
-		TIM4->ARR = 10000;
-		TIM4->CCR1 = 10000;
-		TIM4->CR1 = 0x81;
+		PWM_TIMER->ARR = 10000;
+		PWM_TIMER->CCR1 = 10000;
+		PWM_TIMER->CR1 = 0x81;
 	}
 }
 
