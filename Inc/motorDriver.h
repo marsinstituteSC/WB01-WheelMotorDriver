@@ -5,7 +5,7 @@
 #include "stm32f4xx_hal.h"
 #include "stdint.h"
 
-
+#define VenstreFront(r) (1/tan(r))
 typedef union {
   struct {
     uint8_t mikrobus;

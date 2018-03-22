@@ -39,7 +39,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "spi.h"
-#include "main.h"
+
 #include "gpio.h"
 
 /* USER CODE BEGIN 0 */

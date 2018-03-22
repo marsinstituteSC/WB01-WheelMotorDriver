@@ -40,7 +40,7 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "spi.h"
-#include "TIM_oppsett.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
@@ -110,7 +110,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI3_Init();
-  TIM_Init();
+  MX_TIM4_Init();
+  MX_TIM1_Init();
 
   /* USER CODE BEGIN 2 */
 	CANSPI_Initialize();
