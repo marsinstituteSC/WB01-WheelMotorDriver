@@ -1,3 +1,5 @@
 /Debug/
 *.o
 *.o
+.settings/language.settings.xml
+*.xml
