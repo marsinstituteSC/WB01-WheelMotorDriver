@@ -40,7 +40,7 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "spi.h"
-#include "tim.h"
+#include "TIM_oppsett.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
