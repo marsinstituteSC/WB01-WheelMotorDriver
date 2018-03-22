@@ -3,8 +3,22 @@
 #define MOTORDRIVER_H_
 
 #include "stm32f4xx_hal.h"
-#include "main.h"
+#include "stdint.h"
 
+
+typedef union {
+  struct {
+    uint8_t mikrobus;
+    uint16_t driveFilter;
+    uint8_t startByte;
+    uint8_t antallBytes;
+    uint16_t pulseRev;
+    uint16_t revPerSekund;
+    uint8_t unsignedsigned;
+    uint8_t gpiomode;
+  } oppsett;
+  uint8_t array[11];
+} MotorSetting;
 
 
 #define MOTOR_FRAM()   	{	HAL_TIM_PWM_Stop(PWM_TIM,TIM_CHANNEL_1);								\

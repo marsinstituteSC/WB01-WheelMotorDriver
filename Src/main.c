@@ -40,7 +40,7 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "spi.h"
-#include "tim.h"
+#include "TIM_oppsett.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
@@ -78,6 +78,16 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+
+	MotorSetting Motor;
+	Motor.oppsett.mikrobus = 1;
+	Motor.oppsett.driveFilter = 0x251;
+	Motor.oppsett.startByte = 2;
+	Motor.oppsett.antallBytes = 2;
+	Motor.oppsett.pulseRev = 40000;
+	Motor.oppsett.revPerSekund = 50;
+	Motor.oppsett.unsignedsigned = 1;
+	Motor.oppsett.gpiomode = 1;
 
   /* USER CODE END 1 */
 
@@ -120,18 +130,30 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1) {
 
-		txMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-		txMessage.frame.id = 0x0A;
-		txMessage.frame.dlc = 8;
-		txMessage.frame.data0 = 0xFF;
-		txMessage.frame.data1 = 0xFF;
-		txMessage.frame.data2 = 0xFF;
-		txMessage.frame.data3 = 0xFF;
-		txMessage.frame.data4 = 0xFF;
-		txMessage.frame.data5 = 0xFF;
-		txMessage.frame.data6 = 0xFF;
-		txMessage.frame.data7 = 0xFF;
-		CANSPI_Transmit(&txMessage);
+		switch (rxMessage.frame.id) {
+			case 0x300:
+				PWM_Set_Frekvens(rxMessage.frame.data0);
+			case 0x000:
+
+			case 0x000:
+
+				break;
+			default:
+				break;
+		}
+
+//		txMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+//		txMessage.frame.id = 0x0A;
+//		txMessage.frame.dlc = 8;
+//		txMessage.frame.data0 = 0xFF;
+//		txMessage.frame.data1 = 0xFF;
+//		txMessage.frame.data2 = 0xFF;
+//		txMessage.frame.data3 = 0xFF;
+//		txMessage.frame.data4 = 0xFF;
+//		txMessage.frame.data5 = 0xFF;
+//		txMessage.frame.data6 = 0xFF;
+//		txMessage.frame.data7 = 0xFF;
+//		CANSPI_Transmit(&txMessage);
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
