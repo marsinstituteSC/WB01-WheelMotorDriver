@@ -48,7 +48,7 @@
 #include "motorDriver.h"
 #include "stdio.h"
 #include "stdlib.h"
-TIM_HandleTypeDef htim1;
+
 
 /* USER CODE END Includes */
 
@@ -110,8 +110,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI3_Init();
-  MX_TIM4_Init();
-//  MX_TIM1_Init();
+  TIM_Init();
 
   /* USER CODE BEGIN 2 */
 	CANSPI_Initialize();
@@ -132,7 +131,7 @@ int main(void)
 
 		switch (rxMessage.frame.id) {
 			case 0x300:
-				PWM_Set_Frekvens(rxMessage.frame.data0);
+
 			case 0x000:
 
 			case 0x000:
