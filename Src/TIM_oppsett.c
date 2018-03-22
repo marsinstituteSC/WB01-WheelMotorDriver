@@ -4,11 +4,26 @@
 
 //#ifdef adapterModulMB2
 
-TIM_HandleTypeDef htim1;
-TIM_HandleTypeDef htim4;
 
 /* TIM1 init function */
-void MX_TIM1_Init(void)
+void TIM_Init(void)
+{
+#ifdef adapterModulMB1
+	TIM_HandleTypeDef htim1;
+	MX_TIM1_Init(htim1);
+	HAL_TIM_Base_Start(&htim1);
+	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+#endif
+
+#ifdef adapterModulMB2
+	TIM_HandleTypeDef htim4;
+	MX_TIM4_Init(htim4);
+	HAL_TIM_Base_Start(&htim4);
+	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
+#endif
+
+}
+void MX_TIM1_Init(TIM_HandleTypeDef htim1)
 {
   TIM_MasterConfigTypeDef sMasterConfig;
   TIM_OC_InitTypeDef sConfigOC;
@@ -60,7 +75,7 @@ void MX_TIM1_Init(void)
 
 }
 /* TIM4 init function */
-void MX_TIM4_Init(void)
+void MX_TIM4_Init(TIM_HandleTypeDef htim4)
 {
   TIM_ClockConfigTypeDef sClockSourceConfig;
   TIM_MasterConfigTypeDef sMasterConfig;
