@@ -30,6 +30,7 @@
 #define CAN_INT_Pin GPIO_PIN_10
 #define CAN_INT_GPIO_Port GPIOE
 #define CAN_INT_EXTI_IRQn EXTI15_10_IRQn
+#define CAN_SPI SPI3
 
 #endif
 
@@ -40,6 +41,7 @@
 #define CAN_INT_Pin GPIO_PIN_14
 #define CAN_INT_GPIO_Port GPIOE
 #define CAN_INT_EXTI_IRQn EXTI15_10_IRQn
+#define CAN_SPI SPI2
 
 #endif
 

@@ -34,6 +34,8 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
+#include "cmsis_os.h"
+#include "CANSPI.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -41,35 +43,13 @@
 
 /* External variables --------------------------------------------------------*/
 
+extern TIM_HandleTypeDef htim2;
+extern uCAN_MSG rxMessage;
+extern osMessageQId MeldingQueueHandle;
+
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
-
-/**
-* @brief This function handles System service call via SWI instruction.
-*/
-void SVC_Handler(void)
-{
-  /* USER CODE BEGIN SVCall_IRQn 0 */
-
-  /* USER CODE END SVCall_IRQn 0 */
-  /* USER CODE BEGIN SVCall_IRQn 1 */
-
-  /* USER CODE END SVCall_IRQn 1 */
-}
-
-/**
-* @brief This function handles Pendable request for system service.
-*/
-void PendSV_Handler(void)
-{
-  /* USER CODE BEGIN PendSV_IRQn 0 */
-
-  /* USER CODE END PendSV_IRQn 0 */
-  /* USER CODE BEGIN PendSV_IRQn 1 */
-
-  /* USER CODE END PendSV_IRQn 1 */
-}
 
 /**
 * @brief This function handles System tick timer.
@@ -79,8 +59,7 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
-  HAL_SYSTICK_IRQHandler();
+  osSystickHandler();
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
@@ -94,11 +73,28 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+* @brief This function handles TIM2 global interrupt.
+*/
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
 * @brief This function handles EXTI line[15:10] interrupts.
 */
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+	uCAN_MSG tempmsg;
+	CANSPI_Receive(&tempmsg);
+	xQueueSend(MeldingQueueHandle,&tempmsg,0);
 
 //	if(CANSPI_Receive(&rxMessage))
 //	    {
