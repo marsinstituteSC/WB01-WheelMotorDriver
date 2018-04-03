@@ -6,6 +6,7 @@
 
 #define canModulMB1
 #define adapterModulMB2
+#define motorVF
 
 
 #define mask0 0x000
