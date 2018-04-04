@@ -1,14 +1,9 @@
 #include "MCP2515.h"
 #include "oppsett.h"
-#include "spi.h"
+#include "SPI_oppsett.h"
 
 /* Modify below items for your SPI configurations */
-#ifdef canModulMB1
-#define SPI_CAN                 &hspi3
-#endif
-#ifdef canModulMB2
-#define SPI_CAN                 &hspi2
-#endif
+#define SPI_CAN &hspi
 
 
 #define SPI_TIMEOUT             10

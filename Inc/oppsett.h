@@ -55,8 +55,6 @@
 #define DRIVE_DIR_GPIO_Port GPIOE
 #define DRIVE_PWM_Pin GPIO_PIN_9
 #define DRIVE_PWM_GPIO_Port GPIOE
-#define DRIVE_PWM2_Pin GPIO_PIN_9
-#define DRIVE_PWM2_GPIO_Port GPIOE
 #define PWM_TIMER TIM1
 
 #endif

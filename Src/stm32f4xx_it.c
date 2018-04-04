@@ -36,6 +36,7 @@
 #include "stm32f4xx_it.h"
 #include "cmsis_os.h"
 #include "CANSPI.h"
+#include "queue.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -45,7 +46,7 @@
 
 extern TIM_HandleTypeDef htim2;
 extern uCAN_MSG rxMessage;
-extern osMessageQId MeldingQueueHandle;
+extern QueueHandle_t MeldingQueueHandle;
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
@@ -93,8 +94,10 @@ void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 	uCAN_MSG tempmsg;
-	CANSPI_Receive(&tempmsg);
-	xQueueSend(MeldingQueueHandle,&tempmsg,0);
+	if(CANSPI_Receive(&tempmsg)){
+		xQueueSend(MeldingQueueHandle,&tempmsg,0);
+	}
+
 
 //	if(CANSPI_Receive(&rxMessage))
 //	    {
@@ -131,7 +134,7 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
-
+  portEND_SWITCHING_ISR(pdTRUE);
   /* USER CODE END EXTI15_10_IRQn 1 */
 }
 

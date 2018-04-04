@@ -157,9 +157,13 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+	uCAN_MSG tempmessage;
+
   for(;;)
   {
-    osDelay(1);
+	  if(CANSPI_Receive(&tempmessage)){
+		  xQueueSend(MeldingQueueHandle,&tempmessage,osWaitForever);
+	  }
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -201,30 +205,31 @@ void StartTask04(void const * argument)
   /* USER CODE BEGIN StartTask04 */
   /* Infinite loop */
 	uCAN_MSG tempRxMessage;
+	uCAN_MSG temptxmessage;
 	uint16_t fart;
 	uint32_t radius;
   for(;;)
   {
 	  if(xQueueReceive(MeldingQueueHandle,&tempRxMessage,osWaitForever)){
-		  switch (tempRxMessage.frame.id) {
-			case 0x200:
-				fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-				xQueueSend(FartQueueHandle,&fart,0);
-			case 0x300:
-				radius = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-				xQueueSend(AckerQueueHandle,&radius,0);
-			case 0x400:
-
-			case 0x100:
-
-
-			default:
-				break;
+		  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+		  xQueueSend(FartQueueHandle,&fart,0);
+		  CANSPI_Transmit(&temptxmessage);
+//		  switch (tempRxMessage.frame.id) {
+//			case 0x100:
+//				fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+//				xQueueSend(FartQueueHandle,&fart,0);
+//			case 0x410:
+//				radius = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+//				xQueueSend(AckerQueueHandle,&radius,0);
+//			case 0x400:
+//				break;
+//			default:
+//				break;
+//		}
 		}
-		}
 
 
-    osDelay(1);
+//    osDelay(1);
   }
   /* USER CODE END StartTask04 */
 }

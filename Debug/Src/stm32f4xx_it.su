@@ -1,3 +1,3 @@
-stm32f4xx_it.c:57:6:SysTick_Handler	0	static
-stm32f4xx_it.c:78:6:TIM2_IRQHandler	0	static
-stm32f4xx_it.c:92:6:EXTI15_10_IRQHandler	32	static
+stm32f4xx_it.c:58:6:SysTick_Handler	0	static
+stm32f4xx_it.c:79:6:TIM2_IRQHandler	0	static
+stm32f4xx_it.c:93:6:EXTI15_10_IRQHandler	32	static

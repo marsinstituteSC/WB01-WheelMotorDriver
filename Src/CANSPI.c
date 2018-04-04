@@ -39,44 +39,44 @@ bool CANSPI_Initialize(void)
   RXM1 RXM1reg;
       
   /* sett Rx Mask-verdier*/
-  RXM0reg.RXM0SIDH = (mask0&0x7F8)>>3;
-  RXM0reg.RXM0SIDL = (mask0&0x7)<<5;
+  RXM0reg.RXM0SIDH = 0x00; //(mask0&0x7F8)>>3;
+  RXM0reg.RXM0SIDL = 0x00;// (mask0&0x7)<<5;
   RXM0reg.RXM0EID8 = 0x00;
   RXM0reg.RXM0EID0 = 0x00;
   
-  RXM1reg.RXM1SIDH = (mask1&0x7F8)>>3;
-  RXM1reg.RXM1SIDL = (mask1&0x7)<<5;
+  RXM1reg.RXM1SIDH = 0x00; //(mask1&0x7F8)>>3;
+  RXM1reg.RXM1SIDL = 0x00; //(mask1&0x7)<<5;
   RXM1reg.RXM1EID8 = 0x00;
   RXM1reg.RXM1EID0 = 0x00;
   
   /* sett RxFilter verdier */
-  RXF0reg.RXF0SIDH = (filter0&0x7F8)>>3;
-  RXF0reg.RXF0SIDL = (filter0&0x7)<<5;     //Standard Filter
+  RXF0reg.RXF0SIDH = 0x00; //(filter0&0x7F8)>>3;
+  RXF0reg.RXF0SIDL = 0x00; //(filter0&0x7)<<5;     //Standard Filter
   RXF0reg.RXF0EID8 = 0x00;
   RXF0reg.RXF0EID0 = 0x00;
   
-  RXF1reg.RXF1SIDH = (filter1&0x7F8)>>3;
-  RXF1reg.RXF1SIDL = (filter1&0x7)<<5;     //Extended Filter
+  RXF1reg.RXF1SIDH = 0x00; //(filter1&0x7F8)>>3;
+  RXF1reg.RXF1SIDL = 0x00; //(filter1&0x7)<<5;     //Extended Filter
   RXF1reg.RXF1EID8 = 0x00;
   RXF1reg.RXF1EID0 = 0x00;
   
-  RXF2reg.RXF2SIDH = (filter2&0x7F8)>>3;
-  RXF2reg.RXF2SIDL = (filter2&0x7)<<5;
+  RXF2reg.RXF2SIDH = 0x00; //(filter2&0x7F8)>>3;
+  RXF2reg.RXF2SIDL = 0x00; //(filter2&0x7)<<5;
   RXF2reg.RXF2EID8 = 0x00;
   RXF2reg.RXF2EID0 = 0x00;
   
-  RXF3reg.RXF3SIDH = (filter3&0x7F8)>>3;
-  RXF3reg.RXF3SIDL = (filter3&0x7)<<5;
+  RXF3reg.RXF3SIDH = 0x00; //(filter3&0x7F8)>>3;
+  RXF3reg.RXF3SIDL = 0x00; //(filter3&0x7)<<5;
   RXF3reg.RXF3EID8 = 0x00;
   RXF3reg.RXF3EID0 = 0x00;
   
-  RXF4reg.RXF4SIDH = (filter4&0x7F8)>>3;
-  RXF4reg.RXF4SIDL = (filter4&0x7)<<5;
+  RXF4reg.RXF4SIDH = 0x00; //(filter4&0x7F8)>>3;
+  RXF4reg.RXF4SIDL = 0x00; //(filter4&0x7)<<5;
   RXF4reg.RXF4EID8 = 0x00;
   RXF4reg.RXF4EID0 = 0x00;
   
-  RXF5reg.RXF5SIDH = (filter5&0x7F8)>>3;
-  RXF5reg.RXF5SIDL = (filter5&0x7)<<5;
+  RXF5reg.RXF5SIDH = 0x00; //(filter5&0x7F8)>>3;
+  RXF5reg.RXF5SIDL = 0x00; //(filter5&0x7)<<5;
   RXF5reg.RXF5EID8 = 0x00;
   RXF5reg.RXF5EID0 = 0x00;
   
