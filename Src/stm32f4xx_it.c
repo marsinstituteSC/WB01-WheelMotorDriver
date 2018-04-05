@@ -95,29 +95,15 @@ void TIM2_IRQHandler(void)
 */
 void EXTI15_10_IRQHandler(void)
 {
-	teller++;
-	if(teller>=sizeof(uint16_t)){
-		teller=0;
-	}
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+	xSemaphoreGiveFromISR(ISRSemaHandle,&xHigherPriorityTaskWoken);
 
-	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
-//	if(paa == 1){
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
-//		paa = 0;
-//	}else {
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_RESET);
-//		paa = 1;
-//	}
-
-//	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-//  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-//	xSemaphoreGiveFromISR(ISRSemaHandle,&xHigherPriorityTaskWoken);
-//
-//  /* USER CODE END EXTI15_10_IRQn 0 */
-//  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
-//  /* USER CODE BEGIN EXTI15_10_IRQn 1 */;
-//  /* USER CODE END EXTI15_10_IRQn 1 */
-//  	 portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+  /* USER CODE END EXTI15_10_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */;
+  /* USER CODE END EXTI15_10_IRQn 1 */
+  	 portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 /* USER CODE BEGIN 1 */

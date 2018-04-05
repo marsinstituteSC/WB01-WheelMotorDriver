@@ -124,7 +124,7 @@ void MX_FREERTOS_Init(void) {
   AckermannTaskHandle = osThreadCreate(osThread(AckermannTask), NULL);
 
   /* definition and creation of CANbehandling */
-  osThreadDef(CANbehandling, StartTask04, osPriorityNormal, 0, 128);
+  osThreadDef(CANbehandling, StartTask04, osPriorityRealtime, 0, 128);
   CANbehandlingHandle = osThreadCreate(osThread(CANbehandling), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -163,10 +163,9 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  teller2--;
-	  if(teller2<=0){
-		  teller2=65000;
-	  }
+	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 0);
+	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+	  vTaskDelete(defaultTaskHandle);
 
   }
   /* USER CODE END StartDefaultTask */
@@ -178,7 +177,6 @@ void StartTask02(void const * argument)
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
 	uint16_t fart = 0;
-	uint8_t task2= 0;
   for(;;)
   {
 	if(xQueueReceive(FartQueueHandle,&fart,osWaitForever)){
@@ -209,8 +207,7 @@ void StartTask04(void const * argument)
 {
   /* USER CODE BEGIN StartTask04 */
 //  /* Infinite loop */
-//	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 0);
-//	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 	uCAN_MSG tempRxMessage;
 	uCAN_MSG temptxmessage;
 	uint16_t fart;
@@ -218,11 +215,11 @@ void StartTask04(void const * argument)
   for(;;)
   {
 //		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
-//	  if(xSemaphoreTake(ISRSemaHandle,osWaitForever)){
-//		  if(CANSPI_Receive(&tempRxMessage)){
-//			  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-//			  xQueueSend(FartQueueHandle,&fart,0);
-//			  CANSPI_Transmit(&temptxmessage);
+	  if(xSemaphoreTake(ISRSemaHandle,osWaitForever)){
+		  if(CANSPI_Receive(&tempRxMessage)){
+			  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+			  xQueueSend(FartQueueHandle,&fart,0);
+			  CANSPI_Transmit(&temptxmessage);
 //		//		  switch (tempRxMessage.frame.id) {
 //		//			case 0x100:
 //		//				fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
@@ -235,8 +232,8 @@ void StartTask04(void const * argument)
 //		//			default:
 //		//				break;
 //		//		}
-//			}
-//	  }
+			}
+	  }
 
 //    osDelay(1);
   }
