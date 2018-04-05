@@ -47,6 +47,9 @@
 extern TIM_HandleTypeDef htim2;
 extern uCAN_MSG rxMessage;
 extern QueueHandle_t MeldingQueueHandle;
+extern SemaphoreHandle_t ISRSemaHandle;
+uint8_t paa = 1;
+uint16_t teller = 0;
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
@@ -92,50 +95,29 @@ void TIM2_IRQHandler(void)
 */
 void EXTI15_10_IRQHandler(void)
 {
-  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-	uCAN_MSG tempmsg;
-	if(CANSPI_Receive(&tempmsg)){
-		xQueueSend(MeldingQueueHandle,&tempmsg,0);
+	teller++;
+	if(teller>=sizeof(uint16_t)){
+		teller=0;
 	}
 
+	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
+//	if(paa == 1){
+//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
+//		paa = 0;
+//	}else {
+//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_RESET);
+//		paa = 1;
+//	}
 
-//	if(CANSPI_Receive(&rxMessage))
-//	    {
+//	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+//  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+//	xSemaphoreGiveFromISR(ISRSemaHandle,&xHigherPriorityTaskWoken);
 //
-//		if(rxMessage.frame.data0==0){
-//			PWM_Set_Frekvens(0);
-//		}
-//	    PWM_Set_Frekvens(rxMessage.frame.data0);
-//	    }
-//	if(CANSPI_Receive(&rxMessage))
-//	    {
-//		retning = (rxMessage.frame.data0>>7)&0x1;
-//		fart = ((rxMessage.frame.data0<<8)+rxMessage.frame.data1);
-//		if((fart>=1)){
-////			MOTOR_FRAM();
-//			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-//			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_SET);
-//			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
-//			PWM_Set_Frekvens(fart);
-//		}
-//		else if((fart<=-1)){
-//			HAL_TIM_PWM_Stop(&htim4,TIM_CHANNEL_1);
-//			HAL_GPIO_WritePin(DRIVE_DIR_GPIO_Port, DRIVE_DIR_Pin, GPIO_PIN_RESET);
-//			HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
-//			PWM_Set_Frekvens(-fart);
-//		}
-//		else{PWM_Set_Frekvens(0);}
-////		if((rxMessage.frame.data0==0) & (rxMessage.frame.data1==0)){
-////			PWM_Set_Frekvens(0);
-////		}
-	// }
-
-
-  /* USER CODE END EXTI15_10_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
-  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
-  portEND_SWITCHING_ISR(pdTRUE);
-  /* USER CODE END EXTI15_10_IRQn 1 */
+//  /* USER CODE END EXTI15_10_IRQn 0 */
+//  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+//  /* USER CODE BEGIN EXTI15_10_IRQn 1 */;
+//  /* USER CODE END EXTI15_10_IRQn 1 */
+//  	 portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 /* USER CODE BEGIN 1 */

@@ -65,6 +65,9 @@ osThreadId CANbehandlingHandle;
 QueueHandle_t MeldingQueueHandle;
 QueueHandle_t FartQueueHandle;
 QueueHandle_t AckerQueueHandle;
+SemaphoreHandle_t ISRSemaHandle;
+uint16_t teller2 = 0;
+extern uint16_t tellertest;
 
 //osMessageQId FartQueueHandle;
 //osMessageQId RadiusQueueHandle;
@@ -121,7 +124,7 @@ void MX_FREERTOS_Init(void) {
   AckermannTaskHandle = osThreadCreate(osThread(AckermannTask), NULL);
 
   /* definition and creation of CANbehandling */
-  osThreadDef(CANbehandling, StartTask04, osPriorityRealtime, 0, 128);
+  osThreadDef(CANbehandling, StartTask04, osPriorityNormal, 0, 128);
   CANbehandlingHandle = osThreadCreate(osThread(CANbehandling), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -145,6 +148,7 @@ void MX_FREERTOS_Init(void) {
   MeldingQueueHandle = xQueueCreate(16,sizeof(uCAN_MSG));
   FartQueueHandle = xQueueCreate(16,sizeof(uint16_t));
   AckerQueueHandle = xQueueCreate(16,sizeof(uint32_t));
+  ISRSemaHandle = xSemaphoreCreateBinary();
 
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -157,13 +161,13 @@ void StartDefaultTask(void const * argument)
 
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-	uCAN_MSG tempmessage;
-
   for(;;)
   {
-	  if(CANSPI_Receive(&tempmessage)){
-		  xQueueSend(MeldingQueueHandle,&tempmessage,osWaitForever);
+	  teller2--;
+	  if(teller2<=0){
+		  teller2=65000;
 	  }
+
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -174,6 +178,7 @@ void StartTask02(void const * argument)
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
 	uint16_t fart = 0;
+	uint8_t task2= 0;
   for(;;)
   {
 	if(xQueueReceive(FartQueueHandle,&fart,osWaitForever)){
@@ -203,31 +208,35 @@ void StartTask03(void const * argument)
 void StartTask04(void const * argument)
 {
   /* USER CODE BEGIN StartTask04 */
-  /* Infinite loop */
+//  /* Infinite loop */
+//	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 0);
+//	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 	uCAN_MSG tempRxMessage;
 	uCAN_MSG temptxmessage;
 	uint16_t fart;
 	uint32_t radius;
   for(;;)
   {
-	  if(xQueueReceive(MeldingQueueHandle,&tempRxMessage,osWaitForever)){
-		  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-		  xQueueSend(FartQueueHandle,&fart,0);
-		  CANSPI_Transmit(&temptxmessage);
-//		  switch (tempRxMessage.frame.id) {
-//			case 0x100:
-//				fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-//				xQueueSend(FartQueueHandle,&fart,0);
-//			case 0x410:
-//				radius = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-//				xQueueSend(AckerQueueHandle,&radius,0);
-//			case 0x400:
-//				break;
-//			default:
-//				break;
-//		}
-		}
-
+//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
+//	  if(xSemaphoreTake(ISRSemaHandle,osWaitForever)){
+//		  if(CANSPI_Receive(&tempRxMessage)){
+//			  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+//			  xQueueSend(FartQueueHandle,&fart,0);
+//			  CANSPI_Transmit(&temptxmessage);
+//		//		  switch (tempRxMessage.frame.id) {
+//		//			case 0x100:
+//		//				fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+//		//				xQueueSend(FartQueueHandle,&fart,0);
+//		//			case 0x410:
+//		//				radius = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+//		//				xQueueSend(AckerQueueHandle,&radius,0);
+//		//			case 0x400:
+//		//				break;
+//		//			default:
+//		//				break;
+//		//		}
+//			}
+//	  }
 
 //    osDelay(1);
   }
