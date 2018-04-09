@@ -201,9 +201,9 @@ void StartTask03(void const * argument)
   for(;;)
 
   {
-	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
-		  fartkonst = (uint32_t)(((sqrt((double)((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
-	  }
+//	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
+//		  fartkonst = (uint32_t)(((sqrt((double)((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
+//	  }
   }
   /* USER CODE END StartTask03 */
 }
@@ -211,46 +211,49 @@ void StartTask03(void const * argument)
 /* StartTask04 function */
 void StartTask04(void const * argument)
 {
-  /* USER CODE BEGIN StartTask04 */
-//  /* Infinite loop */
-
 	uCAN_MSG tempRxMessage;
 	uCAN_MSG temptxmessage;
 	uint16_t fart;
 	uint32_t radius;
   for(;;)
   {
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
 	  if(xSemaphoreTake(ISRSemaHandle,osWaitForever)){
 		  if(CANSPI_Receive(&tempRxMessage)){
-			  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-			  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
-			  xQueueSend(FartQueueHandle,&fart,0);
-			  xQueueSend(AckerQueueHandle,&radius,0);
+			  switch (tempRxMessage.frame.id) {
+				case 0x100:
+					  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+	//			  			  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
+					  xQueueSend(FartQueueHandle,&fart,0);
+	//			  			  xQueueSend(AckerQueueHandle,&radius,0);
+				default:
+					break;
+			}
+//			  			  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+////			  			  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
+//			  			  xQueueSend(FartQueueHandle,&fart,0);
+////			  			  xQueueSend(AckerQueueHandle,&radius,0);
 
-//			  CANSPI_Transmit(&temptxmessage);
-//		//		  switch (tempRxMessage.frame.id) {
-//		//			case 0x100:
-//		//				fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-//		//				xQueueSend(FartQueueHandle,&fart,0);
-//		//			case 0x410:
-//		//				radius = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-//		//				xQueueSend(AckerQueueHandle,&radius,0);
-//		//			case 0x400:
-//		//				break;
-//		//			default:
-//		//				break;
-//		//		}
+//				  switch (tempRxMessage.frame.id) {
+//					case 0x100:
+//						fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+//						xQueueSend(FartQueueHandle,&fart,0);
+//					case 0x410:
+//						radius = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+//						xQueueSend(AckerQueueHandle,&radius,0);
+//					case 0x400:
+//						break;
+//					default:
+//						break;
+//				}
 			}
 	  }
-
-//    osDelay(1);
   }
   /* USER CODE END StartTask04 */
 }
 
 /* USER CODE BEGIN Application */
-     
+
+//
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

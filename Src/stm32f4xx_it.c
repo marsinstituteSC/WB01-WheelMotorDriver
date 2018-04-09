@@ -100,10 +100,10 @@ void EXTI15_10_IRQHandler(void)
 	xSemaphoreGiveFromISR(ISRSemaHandle,&xHigherPriorityTaskWoken);
 
   /* USER CODE END EXTI15_10_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */;
   /* USER CODE END EXTI15_10_IRQn 1 */
-  	 portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+  	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 /* USER CODE BEGIN 1 */

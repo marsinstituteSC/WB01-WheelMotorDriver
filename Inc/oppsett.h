@@ -8,19 +8,15 @@
 #define adapterModulMB2
 #define motorVF
 
+#define mask0 0x7FF
+#define filter0 0x100
+#define filter1 0x7FF
 
-#define mask0 0x000
-#define mask1 0x000
-
-#define filter0 0x000
-#define filter1 0x000
-
-
-
-#define filter2 0x000
-#define filter3 0x000
-#define filter4 0x000
-#define filter5 0x000
+#define mask1 0x7FF
+#define filter2 0x7FF
+#define filter3 0x7FF
+#define filter4 0x7FF
+#define filter5 0x7FF
 
 
 #ifdef canModulMB1

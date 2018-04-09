@@ -31,8 +31,8 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 //		}else if ((fartkonst<=-0.5)||(fartkonst>=-1.5)){
 //			tempfart = tempfart;
 //		}else
-//		{
-			tempfart = (uint16_t) ((tempfart*fartkonst)/1000);
+////		{
+//			tempfart = (uint16_t) ((tempfart*fartkonst)/1000);
 //		}
 //		fart = tempfart;
 		PWM_TIMER->ARR = tempfart;
