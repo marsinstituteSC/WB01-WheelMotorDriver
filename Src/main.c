@@ -73,6 +73,7 @@ uCAN_MSG txMessage;
 uCAN_MSG rxMessage;
 uint16_t periode;
 uint16_t tellertest;
+//uint16_t fart;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

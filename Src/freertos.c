@@ -52,6 +52,7 @@
 #include "queue.h"
 #include "cmsis_os.h"
 #include "CANSPI.h"
+#include "math.h"
 
 /* USER CODE BEGIN Includes */     
 
@@ -68,6 +69,7 @@ QueueHandle_t AckerQueueHandle;
 SemaphoreHandle_t ISRSemaHandle;
 uint16_t teller2 = 0;
 extern uint16_t tellertest;
+uint32_t fartkonst;
 
 //osMessageQId FartQueueHandle;
 //osMessageQId RadiusQueueHandle;
@@ -190,13 +192,17 @@ void StartTask02(void const * argument)
 void StartTask03(void const * argument)
 {
   /* USER CODE BEGIN StartTask03 */
-	uint16_t radius;
+	uint32_t radius;
+	uint32_t radius2;
+	uint32_t bredde = 500;
+	uint32_t bredde2 = 15625;
+	uint32_t lengde = 250000;
   /* Infinite loop */
   for(;;)
 
   {
 	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
-
+		  fartkonst = (uint32_t)(((sqrt((double)((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
 	  }
   }
   /* USER CODE END StartTask03 */
@@ -218,8 +224,11 @@ void StartTask04(void const * argument)
 	  if(xSemaphoreTake(ISRSemaHandle,osWaitForever)){
 		  if(CANSPI_Receive(&tempRxMessage)){
 			  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+			  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
 			  xQueueSend(FartQueueHandle,&fart,0);
-			  CANSPI_Transmit(&temptxmessage);
+			  xQueueSend(AckerQueueHandle,&radius,0);
+
+//			  CANSPI_Transmit(&temptxmessage);
 //		//		  switch (tempRxMessage.frame.id) {
 //		//			case 0x100:
 //		//				fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
