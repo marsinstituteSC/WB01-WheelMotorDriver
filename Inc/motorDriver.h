@@ -20,6 +20,7 @@ typedef union {
 } MotorSetting;
 
 
+
 #ifdef motorVF
 uint16_t prosent = 140/100;
 #endif
@@ -45,6 +46,8 @@ uint16_t prosent = 40/100;
 #endif
 
 void PWM_Set_Frekvens(uint16_t fart);
+void MOTOR_DELAY(void);
+void MOTOR_DIR_TOGGLE(uint16_t dir);
 
 
 #endif /* MOTORDRIVER_H_ */

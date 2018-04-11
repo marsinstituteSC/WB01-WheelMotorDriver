@@ -67,9 +67,7 @@ QueueHandle_t MeldingQueueHandle;
 QueueHandle_t FartQueueHandle;
 QueueHandle_t AckerQueueHandle;
 SemaphoreHandle_t ISRSemaHandle;
-uint16_t teller2 = 0;
-extern uint16_t tellertest;
-uint32_t fartkonst;
+int32_t fartkonst;
 
 //osMessageQId FartQueueHandle;
 //osMessageQId RadiusQueueHandle;
@@ -178,6 +176,7 @@ void StartTask02(void const * argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
+
 	uint16_t fart = 0;
   for(;;)
   {
@@ -192,8 +191,7 @@ void StartTask02(void const * argument)
 void StartTask03(void const * argument)
 {
   /* USER CODE BEGIN StartTask03 */
-	uint32_t radius;
-	uint32_t radius2;
+	int32_t radius;
 	uint32_t bredde = 500;
 	uint32_t bredde2 = 15625;
 	uint32_t lengde = 250000;
@@ -201,22 +199,25 @@ void StartTask03(void const * argument)
   for(;;)
 
   {
-//	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
-//		  fartkonst = (uint32_t)(((sqrt((double)((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
-//	  }
+	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
+		  fartkonst = (((sqrt(((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
+	  }
   }
   /* USER CODE END StartTask03 */
 }
 
 /* StartTask04 function */
+
 void StartTask04(void const * argument)
 {
 	uCAN_MSG tempRxMessage;
-	uCAN_MSG temptxmessage;
 	uint16_t fart;
 	uint32_t radius;
+	int16_t teller=500;
+	uint8_t retn=1;
   for(;;)
   {
+
 	  if(xSemaphoreTake(ISRSemaHandle,osWaitForever)){
 		  if(CANSPI_Receive(&tempRxMessage)){
 			  switch (tempRxMessage.frame.id) {
@@ -224,6 +225,7 @@ void StartTask04(void const * argument)
 					  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
 	//			  			  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
 					  xQueueSend(FartQueueHandle,&fart,0);
+
 	//			  			  xQueueSend(AckerQueueHandle,&radius,0);
 				default:
 					break;

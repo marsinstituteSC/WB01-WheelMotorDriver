@@ -114,27 +114,31 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  SPI_CAN_Init();
+//  SPI_CAN_Init();
   TIMER_Init();
 
   /* USER CODE BEGIN 2 */
-  CANSPI_Initialize();
+//  CANSPI_Initialize();
 
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
+//  MX_FREERTOS_Init();
 
   /* Start scheduler */
-  osKernelStart();
+//  osKernelStart();
   
   /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+	PWM_Set_Frekvens(32000);
 	while (1) {
-
-
+		PWM_Set_Frekvens(0xFFFF);
+		HAL_Delay(10);
+		PWM_Set_Frekvens(0x7FFF);
+		HAL_Delay(10);
 	}
   /* USER CODE END 3 */
 

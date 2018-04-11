@@ -1,22 +1,35 @@
 #ifndef OPPSETT_H_
 #define OPPSETT_H_
 
+// Oppsett moduler og CAN-mask/filter
+//----------------------------------------------------//
+
 #include "stm32f4xx_hal.h"
 #include "motorDriver.h"
+#include "CAN_messages.h"
 
 #define canModulMB1
 #define adapterModulMB2
 #define motorVF
 
-#define mask0 0x7FF
-#define filter0 0x100
-#define filter1 0x7FF
+#define mask0 MASK_ONES
+#define filter0 GLOB_DRIVE
+#define filter1 FLTR_NULL
 
-#define mask1 0x7FF
-#define filter2 0x7FF
-#define filter3 0x7FF
-#define filter4 0x7FF
-#define filter5 0x7FF
+#define mask1 MASK_ONES
+#define filter2 FLTR_NULL
+#define filter3 FLTR_NULL
+#define filter4 FLTR_NULL
+#define filter5 FLTR_NULL
+
+//----------------------------------------------------//
+
+
+
+
+
+
+
 
 
 #ifdef canModulMB1
