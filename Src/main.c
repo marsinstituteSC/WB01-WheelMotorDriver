@@ -119,6 +119,7 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 //  CANSPI_Initialize();
+//  MOTOR_STATE(1);
 
   /* USER CODE END 2 */
 
@@ -132,13 +133,10 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-	PWM_Set_Frekvens(32000);
 	while (1) {
-		PWM_Set_Frekvens(0xFFFF);
-		HAL_Delay(10);
-		PWM_Set_Frekvens(0x7FFF);
-		HAL_Delay(10);
+
+
+
 	}
   /* USER CODE END 3 */
 

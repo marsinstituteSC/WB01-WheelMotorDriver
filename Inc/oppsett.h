@@ -70,8 +70,8 @@
 
 #ifdef adapterModulMB2
 
-#define DRIVE_EN_Pin GPIO_PIN_3
-#define DRIVE_EN_GPIO_Port GPIOA
+#define DRIVE_EN_Pin GPIO_PIN_11
+#define DRIVE_EN_GPIO_Port GPIOE
 #define DRIVE_DIR_Pin GPIO_PIN_14
 #define DRIVE_DIR_GPIO_Port GPIOE
 #define DRIVE_PWM_Pin GPIO_PIN_12

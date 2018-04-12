@@ -67,6 +67,7 @@ QueueHandle_t MeldingQueueHandle;
 QueueHandle_t FartQueueHandle;
 QueueHandle_t AckerQueueHandle;
 SemaphoreHandle_t ISRSemaHandle;
+
 int32_t fartkonst;
 
 //osMessageQId FartQueueHandle;
