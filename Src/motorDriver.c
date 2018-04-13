@@ -2,8 +2,10 @@
 #include "main.h"
 #include "TIM_oppsett.h"
 #include "math.h"
-
+#include <stdlib.h>
+#include "CANSPI.h"
 extern int32_t fartkonst;
+bool retning;
 //extern uint16_t fart;
 
 
@@ -17,6 +19,13 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 		tempfart &= 0x7FFF;
 
 		MOTOR_DIR_TOGGLE(retning);
+
+//		uCAN_MSG txmessage;
+//		txmessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+//		txmessage.frame.dlc = 8;
+//		txmessage.frame.data0 = tempfart >> 8 ;
+//		txmessage.frame.data1 = tempfart;
+//		CANSPI_Transmit(&txmessage);
 
 		if(tempfart >= 1){
 
@@ -41,8 +50,8 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 			PWM_TIMER->CCR1 = (tempfart/2);
 			PWM_TIMER->CR1 = 0x81;
 		}else{
-			PWM_TIMER->ARR = 10000;
-			PWM_TIMER->CCR1 = 10000;
+			PWM_TIMER->ARR = 10;
+			PWM_TIMER->CCR1 = 10;
 			PWM_TIMER->CR1 = 0x81;
 		}
 	}

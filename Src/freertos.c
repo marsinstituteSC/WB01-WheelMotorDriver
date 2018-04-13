@@ -53,6 +53,7 @@
 #include "cmsis_os.h"
 #include "CANSPI.h"
 #include "math.h"
+#include "stdlib.h"
 
 /* USER CODE BEGIN Includes */     
 
@@ -223,11 +224,16 @@ void StartTask04(void const * argument)
 		  if(CANSPI_Receive(&tempRxMessage)){
 			  switch (tempRxMessage.frame.id) {
 				case 0x100:
-					  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-	//			  			  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
-					  xQueueSend(FartQueueHandle,&fart,0);
+					if (((tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1)==0x8000){
+						fart = 0xFFFF;
+					} else {
+						fart = ((tempRxMessage.frame.data0&0x80)<<8);
+						fart += (abs((int16_t)((tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1)));
+					}
 
-	//			  			  xQueueSend(AckerQueueHandle,&radius,0);
+					  xQueueSend(FartQueueHandle,&fart,0);
+//					  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
+//				  	  xQueueSend(AckerQueueHandle,&radius,0);
 				default:
 					break;
 			}
