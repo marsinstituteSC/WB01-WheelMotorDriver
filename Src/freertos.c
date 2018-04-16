@@ -67,7 +67,8 @@ osThreadId CANbehandlingHandle;
 QueueHandle_t MeldingQueueHandle;
 QueueHandle_t FartQueueHandle;
 QueueHandle_t AckerQueueHandle;
-SemaphoreHandle_t ISRSemaHandle;
+SemaphoreHandle_t ISRSemaHandleCAN;
+SemaphoreHandle_t ISRSemaHandleFault;
 
 int32_t fartkonst;
 
@@ -122,7 +123,7 @@ void MX_FREERTOS_Init(void) {
   SettFartTaskHandle = osThreadCreate(osThread(SettFartTask), NULL);
 
   /* definition and creation of AckermannTask */
-  osThreadDef(AckermannTask, StartTask03, osPriorityNormal, 0, 128);
+  osThreadDef(AckermannTask, StartTask03, osPriorityRealtime, 0, 128);
   AckermannTaskHandle = osThreadCreate(osThread(AckermannTask), NULL);
 
   /* definition and creation of CANbehandling */
@@ -150,7 +151,8 @@ void MX_FREERTOS_Init(void) {
   MeldingQueueHandle = xQueueCreate(16,sizeof(uCAN_MSG));
   FartQueueHandle = xQueueCreate(16,sizeof(uint16_t));
   AckerQueueHandle = xQueueCreate(16,sizeof(uint32_t));
-  ISRSemaHandle = xSemaphoreCreateBinary();
+  ISRSemaHandleCAN = xSemaphoreCreateBinary();
+  ISRSemaHandleFault = xSemaphoreCreateBinary();
 
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -165,7 +167,9 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 0);
+	  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 10, 0);
+	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 1);
 	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 	  vTaskDelete(defaultTaskHandle);
 
@@ -201,9 +205,12 @@ void StartTask03(void const * argument)
   for(;;)
 
   {
-	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
-		  fartkonst = (((sqrt(((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
+	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
+		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
 	  }
+//	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
+//		  fartkonst = (((sqrt(((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
+//	  }
   }
   /* USER CODE END StartTask03 */
 }
@@ -214,13 +221,10 @@ void StartTask04(void const * argument)
 {
 	uCAN_MSG tempRxMessage;
 	uint16_t fart;
-	uint32_t radius;
-	int16_t teller=500;
-	uint8_t retn=1;
   for(;;)
   {
 
-	  if(xSemaphoreTake(ISRSemaHandle,osWaitForever)){
+	  if(xSemaphoreTake(ISRSemaHandleCAN,osWaitForever)){
 		  if(CANSPI_Receive(&tempRxMessage)){
 			  switch (tempRxMessage.frame.id) {
 				case 0x100:
@@ -237,23 +241,7 @@ void StartTask04(void const * argument)
 				default:
 					break;
 			}
-//			  			  fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-////			  			  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
-//			  			  xQueueSend(FartQueueHandle,&fart,0);
-////			  			  xQueueSend(AckerQueueHandle,&radius,0);
 
-//				  switch (tempRxMessage.frame.id) {
-//					case 0x100:
-//						fart = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-//						xQueueSend(FartQueueHandle,&fart,0);
-//					case 0x410:
-//						radius = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
-//						xQueueSend(AckerQueueHandle,&radius,0);
-//					case 0x400:
-//						break;
-//					default:
-//						break;
-//				}
 			}
 	  }
   }

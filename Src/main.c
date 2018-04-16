@@ -131,11 +131,23 @@ int main(void)
   
   /* We should never get here as control is now taken by the scheduler */
 
+
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uCAN_MSG tempmessage;
 	while (1) {
-
-
+//		tempmessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+//		tempmessage.frame.id = 0x120;
+//		tempmessage.frame.dlc = 8;
+//		tempmessage.frame.data0 = 0x80;
+//		tempmessage.frame.data1 = 0x08;
+//		tempmessage.frame.data2 = 0x4D;
+//		tempmessage.frame.data3 = 0x41;
+//		tempmessage.frame.data4 = 0x4E;
+//		tempmessage.frame.data5 = 0x69;
+//		CANSPI_Transmit(&tempmessage);
+//		HAL_Delay(10);
 
 	}
   /* USER CODE END 3 */

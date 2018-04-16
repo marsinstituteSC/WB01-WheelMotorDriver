@@ -64,6 +64,8 @@
 #define DRIVE_DIR_GPIO_Port GPIOE
 #define DRIVE_PWM_Pin GPIO_PIN_9
 #define DRIVE_PWM_GPIO_Port GPIOE
+#define DRIVE_FAULT_GPIO_Port GPIOD
+#define DRIVE_FAULT_Pin GPIO_PIN_6
 #define PWM_TIMER TIM1
 
 #endif
@@ -76,6 +78,8 @@
 #define DRIVE_DIR_GPIO_Port GPIOE
 #define DRIVE_PWM_Pin GPIO_PIN_12
 #define DRIVE_PWM_GPIO_Port GPIOD
+#define DRIVE_FAULT_GPIO_Port GPIOD
+#define DRIVE_FAULT_Pin GPIO_PIN_8
 #define PWM_TIMER TIM4
 
 #endif

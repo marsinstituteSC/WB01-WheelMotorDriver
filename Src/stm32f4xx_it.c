@@ -45,11 +45,8 @@
 /* External variables --------------------------------------------------------*/
 
 extern TIM_HandleTypeDef htim2;
-extern uCAN_MSG rxMessage;
-extern QueueHandle_t MeldingQueueHandle;
-extern SemaphoreHandle_t ISRSemaHandle;
-uint8_t paa = 1;
-uint16_t teller = 0;
+extern SemaphoreHandle_t ISRSemaHandleCAN;
+extern SemaphoreHandle_t ISRSemaHandleFault;
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
@@ -97,10 +94,23 @@ void EXTI15_10_IRQHandler(void)
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-	xSemaphoreGiveFromISR(ISRSemaHandle,&xHigherPriorityTaskWoken);
+	xSemaphoreGiveFromISR(ISRSemaHandleCAN,&xHigherPriorityTaskWoken);
 
   /* USER CODE END EXTI15_10_IRQn 0 */
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */;
+  /* USER CODE END EXTI15_10_IRQn 1 */
+  	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+void EXTI9_5_IRQHandler(void)
+{
+	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+	xSemaphoreGiveFromISR(ISRSemaHandleFault,&xHigherPriorityTaskWoken);
+
+  /* USER CODE END EXTI15_10_IRQn 0 */
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */;
   /* USER CODE END EXTI15_10_IRQn 1 */
   	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
