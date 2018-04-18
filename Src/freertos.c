@@ -54,6 +54,7 @@
 #include "CANSPI.h"
 #include "math.h"
 #include "stdlib.h"
+#include "MCP2515.h"
 
 /* USER CODE BEGIN Includes */     
 
@@ -63,7 +64,8 @@
 osThreadId defaultTaskHandle;
 osThreadId SettFartTaskHandle;
 osThreadId AckermannTaskHandle;
-osThreadId CANbehandlingHandle;
+osThreadId CANbehandlingTaskHandle;
+osThreadId MotorFaultTaskHandle;
 QueueHandle_t MeldingQueueHandle;
 QueueHandle_t FartQueueHandle;
 QueueHandle_t AckerQueueHandle;
@@ -82,9 +84,10 @@ int32_t fartkonst;
 
 /* Function prototypes -------------------------------------------------------*/
 void StartDefaultTask(void const * argument);
-void StartTask02(void const * argument);
-void StartTask03(void const * argument);
-void StartTask04(void const * argument);
+void StartMotorTask(void const * argument);
+void StartMotorFaultTask(void const * argument);
+void StartAckermannTask(void const * argument);
+void StartCANTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -97,21 +100,7 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 /* Init FreeRTOS */
 
 void MX_FREERTOS_Init(void) {
-  /* USER CODE BEGIN Init */
-       
-  /* USER CODE END Init */
 
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
@@ -119,36 +108,23 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of SettFartTask */
-  osThreadDef(SettFartTask, StartTask02, osPriorityNormal, 0, 128);
+  osThreadDef(SettFartTask, StartMotorTask, osPriorityNormal, 0, 128);
   SettFartTaskHandle = osThreadCreate(osThread(SettFartTask), NULL);
 
+  osThreadDef(MotorFaultTask, StartMotorFaultTask, osPriorityNormal, 0, 128);
+   MotorFaultTaskHandle = osThreadCreate(osThread(MotorFaultTask), NULL);
+
   /* definition and creation of AckermannTask */
-  osThreadDef(AckermannTask, StartTask03, osPriorityRealtime, 0, 128);
+  osThreadDef(AckermannTask, StartAckermannTask, osPriorityAboveNormal, 0, 128);
   AckermannTaskHandle = osThreadCreate(osThread(AckermannTask), NULL);
 
   /* definition and creation of CANbehandling */
-  osThreadDef(CANbehandling, StartTask04, osPriorityRealtime, 0, 128);
-  CANbehandlingHandle = osThreadCreate(osThread(CANbehandling), NULL);
+  osThreadDef(CANbehandlingTask, StartCANTask, osPriorityRealtime, 0, 128);
+  CANbehandlingTaskHandle = osThreadCreate(osThread(CANbehandlingTask), NULL);
 
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
 
-  /* Create the queue(s) */
-  /* definition and creation of FartQueue */
-//  osMessageQDef(FartQueue, 10, uint16_t);
-//  FartQueueHandle = osMessageCreate(osMessageQ(FartQueue), NULL);
-//
-//  /* definition and creation of RadiusQueue */
-//  osMessageQDef(RadiusQueue, 10, uint32_t);
-//  RadiusQueueHandle = osMessageCreate(osMessageQ(RadiusQueue), NULL);
-//
-//  /* definition and creation of MeldingQueue */
-//  osMessageQDef(MeldingQueue, 16, uCAN_MSG);
-//  MeldingQueueHandle = osMessageCreate(osMessageQ(MeldingQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  MeldingQueueHandle = xQueueCreate(16,sizeof(uCAN_MSG));
   FartQueueHandle = xQueueCreate(16,sizeof(uint16_t));
   AckerQueueHandle = xQueueCreate(16,sizeof(uint32_t));
   ISRSemaHandleCAN = xSemaphoreCreateBinary();
@@ -171,6 +147,7 @@ void StartDefaultTask(void const * argument)
 	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 1);
 	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+	  MCP2515_WriteByte(MCP2515_CANINTF,0x00);
 	  vTaskDelete(defaultTaskHandle);
 
   }
@@ -178,7 +155,7 @@ void StartDefaultTask(void const * argument)
 }
 
 /* StartTask02 function */
-void StartTask02(void const * argument)
+void StartMotorTask(void const * argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
@@ -193,8 +170,36 @@ void StartTask02(void const * argument)
   /* USER CODE END StartTask02 */
 }
 
+
+void StartMotorFaultTask(void const * argument)
+{
+  /* USER CODE BEGIN StartTask02 */
+  /* Infinite loop */
+
+  for(;;)
+  {
+//	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
+//		  PWM_Set_Frekvens(0);
+//		  MOTOR_STATE(0);
+//		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_9,GPIO_PIN_SET);
+//		  vTaskDelay(300);
+//		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_9,GPIO_PIN_SET);
+//		  MOTOR_STATE(1);
+////		  uCAN_MSG tempTxMessage;
+////		  tempTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+////		  tempTxMessage.frame.id = 0x222;
+////		  tempTxMessage.frame.dlc = 1;
+////		  tempTxMessage.frame.data0 = 0x01;
+////		  CANSPI_Transmit(&tempTxMessage);
+
+
+//	  }
+  }
+  /* USER CODE END StartTask02 */
+}
+
 /* StartTask03 function */
-void StartTask03(void const * argument)
+void StartAckermannTask(void const * argument)
 {
   /* USER CODE BEGIN StartTask03 */
 	int32_t radius;
@@ -205,9 +210,9 @@ void StartTask03(void const * argument)
   for(;;)
 
   {
-	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
-		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
-	  }
+//	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
+//		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
+//	  }
 //	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
 //		  fartkonst = (((sqrt(((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
 //	  }
@@ -217,7 +222,7 @@ void StartTask03(void const * argument)
 
 /* StartTask04 function */
 
-void StartTask04(void const * argument)
+void StartCANTask(void const * argument)
 {
 	uCAN_MSG tempRxMessage;
 	uint16_t fart;
