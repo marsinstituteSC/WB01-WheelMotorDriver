@@ -1,6 +1,6 @@
 CANSPI.c:330:13:convertCANid2Reg.constprop	0	static
 CANSPI.c:18:6:CANSPI_Sleep	8	static
-CANSPI.c:30:6:CANSPI_Initialize	40	static
+CANSPI.c:30:6:CANSPI_Initialize	48	static
 CANSPI.c:130:9:CANSPI_Transmit	16	static
 CANSPI.c:178:9:CANSPI_Receive	32	static
 CANSPI.c:230:9:CANSPI_messagesInBuffer	8	static

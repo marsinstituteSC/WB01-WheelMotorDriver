@@ -30,7 +30,9 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 		if(tempfart >= 1){
 
 			tempfart = 10500000000 / (tempfart*5826); //*128
-			if (tempfart <=55){tempfart = 55;}
+
+			if (tempfart <=220){tempfart = 220;}
+//			if (tempfart <=55){tempfart = 55;}
 			if (tempfart >= 65000){tempfart = 65000;}
 
 //			if((fartkonst<=500)||(fartkonst>=1500)){

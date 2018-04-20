@@ -104,11 +104,11 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityRealtime, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of SettFartTask */
-  osThreadDef(SettFartTask, StartMotorTask, osPriorityNormal, 0, 128);
+  osThreadDef(SettFartTask, StartMotorTask, osPriorityAboveNormal, 0, 128);
   SettFartTaskHandle = osThreadCreate(osThread(SettFartTask), NULL);
 
   osThreadDef(MotorFaultTask, StartMotorFaultTask, osPriorityNormal, 0, 128);
@@ -143,8 +143,8 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 10, 0);
-	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+//	  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 10, 0);
+//	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 1);
 	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 	  MCP2515_WriteByte(MCP2515_CANINTF,0x00);
