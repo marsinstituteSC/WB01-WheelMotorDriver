@@ -122,7 +122,6 @@ int main(void)
   MOTOR_STATE(1);
 
   /* USER CODE END 2 */
-  PWM_Set_Frekvens(500);
 
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();

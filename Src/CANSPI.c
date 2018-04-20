@@ -39,8 +39,8 @@ bool CANSPI_Initialize(void)
   RXM1 RXM1reg;
       
   /* sett Rx Mask-verdier*/
-  RXM0reg.RXM0SIDH = (mask0&0x7F8)>>3;
-  RXM0reg.RXM0SIDL = (mask0&0x7)<<5;
+  RXM0reg.RXM0SIDH = 0x00;(mask0&0x7F8)>>3;
+  RXM0reg.RXM0SIDL = 0x00;(mask0&0x7)<<5;
   RXM0reg.RXM0EID8 = 0x00;
   RXM0reg.RXM0EID0 = 0x00;
   
