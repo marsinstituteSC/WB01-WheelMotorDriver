@@ -36,6 +36,7 @@
 #include "stm32f4xx_it.h"
 #include "cmsis_os.h"
 #include "CANSPI.h"
+#include "FreeRTOS.h"
 #include "queue.h"
 
 /* USER CODE BEGIN 0 */

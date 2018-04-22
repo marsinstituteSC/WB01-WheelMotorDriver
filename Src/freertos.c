@@ -71,6 +71,7 @@ QueueHandle_t FartQueueHandle;
 QueueHandle_t AckerQueueHandle;
 SemaphoreHandle_t ISRSemaHandleCAN;
 SemaphoreHandle_t ISRSemaHandleFault;
+SemaphoreHandle_t AckerProtHandle;
 
 int32_t fartkonst;
 
@@ -129,6 +130,7 @@ void MX_FREERTOS_Init(void) {
   AckerQueueHandle = xQueueCreate(16,sizeof(uint32_t));
   ISRSemaHandleCAN = xSemaphoreCreateBinary();
   ISRSemaHandleFault = xSemaphoreCreateBinary();
+  AckerProtHandle = xSemaphoreCreateMutex();
 
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -210,12 +212,21 @@ void StartAckermannTask(void const * argument)
   for(;;)
 
   {
-//	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
-//		  HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
-//	  }
-//	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
-//		  fartkonst = (((sqrt(((radius*radius)-radius*bredde+bredde2+lengde)))/radius)*1000) ;
-//	  }
+
+	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
+
+		  if(xSemaphoreTake(AckerProtHandle,osWaitForever)){
+			  if(radius==0x80000000){
+				  fartkonst = 1;
+			  } else if (( radius==1)||(radius==-1)){
+				  fartkonst = 1; //fiks
+			  }else {
+				  fartkonst = (sqrt((float)((radius*radius)-radius*bredde+bredde2+lengde))/radius)*1000;
+			  }
+			  if(fartkonst<=0){fartkonst = -fartkonst;}
+			  xSemaphoreGive(AckerProtHandle);
+		  }
+	  }
   }
   /* USER CODE END StartTask03 */
 }
@@ -226,10 +237,12 @@ void StartCANTask(void const * argument)
 {
 	uCAN_MSG tempRxMessage;
 	uint16_t fart;
+	int32_t radius;
   for(;;)
   {
 
 	  if(xSemaphoreTake(ISRSemaHandleCAN,osWaitForever)){
+
 		  if(CANSPI_Receive(&tempRxMessage)){
 			  switch (tempRxMessage.frame.id) {
 				case 0x100:
@@ -241,13 +254,14 @@ void StartCANTask(void const * argument)
 					}
 
 					  xQueueSend(FartQueueHandle,&fart,0);
-//					  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
-//				  	  xQueueSend(AckerQueueHandle,&radius,0);
+					  radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
+				  	  xQueueSend(AckerQueueHandle,&radius,0);
 				default:
 					break;
 			}
 
 			}
+
 	  }
   }
   /* USER CODE END StartTask04 */

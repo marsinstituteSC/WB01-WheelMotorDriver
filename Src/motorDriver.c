@@ -4,7 +4,11 @@
 #include "math.h"
 #include <stdlib.h>
 #include "CANSPI.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "cmsis_os.h"
 extern int32_t fartkonst;
+extern SemaphoreHandle_t AckerProtHandle;
 bool retning;
 //extern uint16_t fart;
 
@@ -15,39 +19,25 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 
 	if(HAL_GPIO_ReadPin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin)){
 
+
+
 		bool retning = (tempfart>>15) & 0x01;
 		tempfart &= 0x7FFF;
 
 		MOTOR_DIR_TOGGLE(retning);
-
-//		uCAN_MSG txmessage;
-//		txmessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-//		txmessage.frame.dlc = 8;
-//		txmessage.frame.data0 = tempfart >> 8 ;
-//		txmessage.frame.data1 = tempfart;
-//		CANSPI_Transmit(&txmessage);
 
 		if(tempfart >= 1){
 
 			tempfart = 10500000000 / (tempfart*5826); //*128
 
 			if (tempfart <=55){tempfart = 55;}
-//			if (tempfart <=55){tempfart = 55;}
 			if (tempfart >= 65000){tempfart = 65000;}
 
-//			if((fartkonst<=500)||(fartkonst>=1500)){
-//				tempfart = tempfart;
-//			}else if ((fartkonst<=-1500)||(fartkonst>=-500)){
-//				tempfart = tempfart;
-//			}else
-//			{
-//				if(fartkonst<=0){
-//					tempfart = (uint16_t) ((tempfart*(-fartkonst))/1000);
-//				}else{
-//					tempfart = (uint16_t) ((tempfart*(fartkonst))/1000);
-//				}
 
-	//		fart = tempfart;
+//			xSemaphoreTake(AckerProtHandle,osWaitForever);
+//			tempfart = ((tempfart*(fartkonst))/1000);
+//			xSemaphoreGive(AckerProtHandle);
+
 			PWM_TIMER->ARR = tempfart;
 			PWM_TIMER->CCR1 = (tempfart/2);
 			PWM_TIMER->CR1 = 0x81;

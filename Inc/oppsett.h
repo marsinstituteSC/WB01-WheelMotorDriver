@@ -12,6 +12,7 @@
 #define adapterModulMB2
 #define motorVF
 
+//----- CAN mask & filter oppsett -----//
 #define mask0 MASK_ONES
 #define filter0 GLOB_DRIVE
 #define filter1 FLTR_NULL
@@ -21,6 +22,8 @@
 #define filter3 FLTR_NULL
 #define filter4 FLTR_NULL
 #define filter5 FLTR_NULL
+
+
 
 //----------------------------------------------------//
 
