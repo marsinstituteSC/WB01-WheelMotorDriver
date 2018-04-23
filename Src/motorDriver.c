@@ -7,8 +7,10 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "cmsis_os.h"
+extern uint16_t farttest;
 extern int32_t fartkonst;
 extern SemaphoreHandle_t AckerProtHandle;
+extern uint8_t plsfunk;
 bool retning;
 //extern uint16_t fart;
 
@@ -34,17 +36,16 @@ void PWM_Set_Frekvens(uint16_t tempfart){
 			if (tempfart >= 65000){tempfart = 65000;}
 
 
-//			xSemaphoreTake(AckerProtHandle,osWaitForever);
-//			tempfart = ((tempfart*(fartkonst))/1000);
-//			xSemaphoreGive(AckerProtHandle);
+			tempfart = ((tempfart*((uint16_t)fartkonst))/1000);
 
+			farttest = tempfart;
 			PWM_TIMER->ARR = tempfart;
 			PWM_TIMER->CCR1 = (tempfart/2);
 			PWM_TIMER->CR1 = 0x81;
 		}else{
 			PWM_TIMER->ARR = 10;
 			PWM_TIMER->CCR1 = 10;
-			PWM_TIMER->CR1 = 0x81;
+			PWM_TIMER->CR1 = 0x80;
 		}
 	}
 }

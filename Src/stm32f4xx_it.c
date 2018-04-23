@@ -93,6 +93,7 @@ void TIM2_IRQHandler(void)
 */
 void EXTI15_10_IRQHandler(void)
 {
+	HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_15);
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 	xSemaphoreGiveFromISR(ISRSemaHandleCAN,&xHigherPriorityTaskWoken);
@@ -105,7 +106,6 @@ void EXTI15_10_IRQHandler(void)
 }
 void EXTI9_5_IRQHandler(void)
 {
-	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_15,GPIO_PIN_SET);
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 	xSemaphoreGiveFromISR(ISRSemaHandleFault,&xHigherPriorityTaskWoken);

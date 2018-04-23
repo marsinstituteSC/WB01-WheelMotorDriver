@@ -39,19 +39,19 @@ bool CANSPI_Initialize(void)
   RXM1 RXM1reg;
       
   /* sett Rx Mask-verdier*/
-  RXM0reg.RXM0SIDH = 0x00; //(mask0&0x7F8)>>3;
-  RXM0reg.RXM0SIDL = 0x00; //(mask0&0x7)<<5;
+  RXM0reg.RXM0SIDH = mask0>>3;
+  RXM0reg.RXM0SIDL = (mask0&0x07)<<5;
   RXM0reg.RXM0EID8 = 0x00;
   RXM0reg.RXM0EID0 = 0x00;
   
-  RXM1reg.RXM1SIDH = (mask1&0x7F8)>>3;
-  RXM1reg.RXM1SIDL = (mask1&0x7)<<5;
+  RXM1reg.RXM1SIDH = mask1>>3;
+  RXM1reg.RXM1SIDL = (mask1&0x07)<<5;
   RXM1reg.RXM1EID8 = 0x00;
   RXM1reg.RXM1EID0 = 0x00;
   
   /* sett RxFilter verdier */
-  RXF0reg.RXF0SIDH = (filter0&0x7F8)>>3;
-  RXF0reg.RXF0SIDL = (filter0&0x7)<<5;     //Standard Filter
+  RXF0reg.RXF0SIDH = filter0>>3;
+  RXF0reg.RXF0SIDL = (filter0&0x07)<<5;     //Standard Filter
   RXF0reg.RXF0EID8 = 0x00;
   RXF0reg.RXF0EID0 = 0x00;
   
@@ -138,7 +138,7 @@ uint8_t CANSPI_Transmit(uCAN_MSG *tempCanMsg)
   
   ctrlStatus.ctrl_status = MCP2515_ReadStatus();
   
-  /* Sjekker TxBuffer */
+  /* Sjekker hvilket TxBuffer som er ledig */
   if (ctrlStatus.TXB0REQ != 1)
   {
     /* Konverterer ID*/

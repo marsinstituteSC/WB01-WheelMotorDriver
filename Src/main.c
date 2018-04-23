@@ -62,6 +62,9 @@
 #include "stdlib.h"
 
 
+#include "MCP2515.h"
+
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -120,9 +123,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   CANSPI_Initialize();
   MOTOR_STATE(1);
-
+//  MCP2515_WriteByte(MCP2515_CANCTRL, 0x40); // Loopback-mode
   /* USER CODE END 2 */
-
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
 
