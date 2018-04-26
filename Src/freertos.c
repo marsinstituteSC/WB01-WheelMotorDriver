@@ -75,10 +75,7 @@ SemaphoreHandle_t AckerProtHandle;
 
 int32_t fartkonst;
 uint16_t farttest;
-uint8_t plsfunk = 0;
-//osMessageQId FartQueueHandle;
-//osMessageQId RadiusQueueHandle;
-//osMessageQId MeldingQueueHandle;
+uint16_t farttest2;
 
 /* USER CODE BEGIN Variables */
 
@@ -113,11 +110,11 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(SettFartTask, StartMotorTask, osPriorityAboveNormal, 0, 128);
   SettFartTaskHandle = osThreadCreate(osThread(SettFartTask), NULL);
 
-  osThreadDef(MotorFaultTask, StartMotorFaultTask, osPriorityAboveNormal, 0, 128);
+  osThreadDef(MotorFaultTask, StartMotorFaultTask, osPriorityNormal, 0, 128);
    MotorFaultTaskHandle = osThreadCreate(osThread(MotorFaultTask), NULL);
 
   /* definition and creation of AckermannTask */
-  osThreadDef(AckermannTask, StartAckermannTask, osPriorityAboveNormal, 0, 128);
+  osThreadDef(AckermannTask, StartAckermannTask, osPriorityNormal, 0, 128);
   AckermannTaskHandle = osThreadCreate(osThread(AckermannTask), NULL);
 
   /* definition and creation of CANbehandling */
@@ -146,8 +143,8 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 10, 0);
-	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+//	  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 10, 0);
+//	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 1);
 	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 	  MCP2515_WriteByte(MCP2515_CANINTF,0x00);
@@ -162,12 +159,18 @@ void StartMotorTask(void const * argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
-
+	uint16_t fartkonst2 = 1000;
 	uint16_t fart = 0;
   for(;;)
   {
 	if(xQueueReceive(FartQueueHandle,&fart,osWaitForever)){
-		PWM_Set_Frekvens(fart);
+		if(xSemaphoreTake(AckerProtHandle,10)){
+			fartkonst2 = (uint16_t)fartkonst;
+			xSemaphoreGive(AckerProtHandle);
+		} else {
+			fartkonst2 = 1000;
+		}
+		PWM_Set_Frekvens(fart,fartkonst2);
 	}
   }
   /* USER CODE END StartTask02 */
@@ -181,22 +184,20 @@ void StartMotorFaultTask(void const * argument)
   for(;;)
   {
 
-	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
-		  PWM_Set_Frekvens(0);
-		  MOTOR_STATE(0);
-		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_9,GPIO_PIN_SET);
-		  vTaskDelay(300);
-		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_9,GPIO_PIN_SET);
-		  MOTOR_STATE(1);
-		  uCAN_MSG tempTxMessage;
-		  tempTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-		  tempTxMessage.frame.id = 0x222;
-		  tempTxMessage.frame.dlc = 1;
-		  tempTxMessage.frame.data0 = 0x01;
-		  CANSPI_Transmit(&tempTxMessage);
-
-
-	  }
+//	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
+//		  PWM_Set_Frekvens(0);
+//		  MOTOR_STATE(0);
+//		  vTaskDelay(300);
+//		  MOTOR_STATE(1);
+//		  uCAN_MSG tempTxMessage;
+//		  tempTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+//		  tempTxMessage.frame.id = 0x222;
+//		  tempTxMessage.frame.dlc = 1;
+//		  tempTxMessage.frame.data0 = 0x01;
+//		  CANSPI_Transmit(&tempTxMessage);
+//
+//
+//	  }
   }
   /* USER CODE END StartTask02 */
 }
@@ -256,13 +257,11 @@ void StartCANTask(void const * argument)
 					xQueueSend(FartQueueHandle,&fart,0);
 					radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
 					xQueueSend(AckerQueueHandle,&radius,0);
-
 				default:
 					break;
 			}
 
 			}
-
 	  }
   }
   /* USER CODE END StartTask04 */

@@ -14,11 +14,11 @@
 
 //----- CAN mask & filter oppsett -----//
 #define mask0 MASK_ONES
-#define filter0 FLTR_NULL
+#define filter0 GLOB_DRIVE
 #define filter1 FLTR_NULL
 
 #define mask1 MASK_ONES
-#define filter2 GLOB_DRIVE
+#define filter2 0x255
 #define filter3 FLTR_NULL
 #define filter4 FLTR_NULL
 #define filter5 FLTR_NULL
