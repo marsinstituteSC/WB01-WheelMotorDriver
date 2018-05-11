@@ -1,16 +1,17 @@
 #ifndef OPPSETT_H_
 #define OPPSETT_H_
 
-// Oppsett moduler og CAN-mask/filter
-//----------------------------------------------------//
-
 #include "stm32f4xx_hal.h"
 #include "motorDriver.h"
 #include "CAN_messages.h"
 
+// Oppsett moduler og CAN-mask/filter
+//----------------------------------------------------//
+
 #define canModulMB1
 #define adapterModulMB2
-#define motorVF
+#define MOTORVF								// Velg motor: "MOTORxx", xx = VF / HF / VM / HM / VB / HB
+											// I fartsretning: V/H = venstre/høyre, F/M/B = framme, midt, bak
 
 //----- CAN mask & filter oppsett -----//
 #define mask0 MASK_ONES
@@ -18,20 +19,33 @@
 #define filter1 FLTR_NULL
 
 #define mask1 MASK_ONES
-#define filter2 0x255
+#define filter2 FLTR_NULL
 #define filter3 FLTR_NULL
 #define filter4 FLTR_NULL
 #define filter5 FLTR_NULL
 
 
-
 //----------------------------------------------------//
 
 
-
-
-
-
+#ifdef MOTORVF
+		#define EN_MOTOR 0x01
+#endif
+#ifdef MOTORHF
+		#define EN_MOTOR 0x02
+#endif
+#ifdef MOTORVM
+		#define EN_MOTOR 0x04
+#endif
+#ifdef MOTORHM
+		#define EN_MOTOR 0x08
+#endif
+#ifdef MOTORVB
+		#define EN_MOTOR 0x10
+#endif
+#ifdef MOTORHB
+		#define EN_MOTOR 0x20
+#endif
 
 
 

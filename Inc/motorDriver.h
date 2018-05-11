@@ -45,7 +45,7 @@ uint16_t prosent = 60/100;
 uint16_t prosent = 40/100;
 #endif
 
-void PWM_Set_Frekvens(uint16_t tempfart, uint16_t konst);
+void MOTOR_PWM_SET(uint16_t tempfart, uint16_t konst);
 void MOTOR_DELAY(void);
 void MOTOR_DIR_TOGGLE(uint16_t dir);
 void MOTOR_STATE(uint8_t state);

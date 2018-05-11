@@ -62,6 +62,7 @@
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
+osThreadId AliveCounterTaskHandle;
 osThreadId SettFartTaskHandle;
 osThreadId AckermannTaskHandle;
 osThreadId CANbehandlingTaskHandle;
@@ -72,7 +73,12 @@ QueueHandle_t AckerQueueHandle;
 SemaphoreHandle_t ISRSemaHandleCAN;
 SemaphoreHandle_t ISRSemaHandleFault;
 SemaphoreHandle_t AckerProtHandle;
+SemaphoreHandle_t globAliveCounterHandle;
 
+
+bool isTaskSuspendedInAC;
+bool isTaskSuspendedInMF;
+bool isTaskSuspendedInCAN;
 int32_t fartkonst;
 uint16_t farttest;
 uint16_t farttest2;
@@ -83,6 +89,7 @@ uint16_t farttest2;
 
 /* Function prototypes -------------------------------------------------------*/
 void StartDefaultTask(void const * argument);
+void StartAliveCounterTask(void const * argument);
 void StartMotorTask(void const * argument);
 void StartMotorFaultTask(void const * argument);
 void StartAckermannTask(void const * argument);
@@ -106,6 +113,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(defaultTask, StartDefaultTask, osPriorityRealtime, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
+  osThreadDef(AliveCounterTask, StartAliveCounterTask, osPriorityRealtime, 0, 128);
+  AliveCounterTaskHandle = osThreadCreate(osThread(AliveCounterTask), NULL);
+
   /* definition and creation of SettFartTask */
   osThreadDef(SettFartTask, StartMotorTask, osPriorityAboveNormal, 0, 128);
   SettFartTaskHandle = osThreadCreate(osThread(SettFartTask), NULL);
@@ -128,6 +138,7 @@ void MX_FREERTOS_Init(void) {
   AckerQueueHandle = xQueueCreate(16,sizeof(uint32_t));
   ISRSemaHandleCAN = xSemaphoreCreateBinary();
   ISRSemaHandleFault = xSemaphoreCreateBinary();
+  globAliveCounterHandle = xSemaphoreCreateBinary();
   AckerProtHandle = xSemaphoreCreateMutex();
 
   /* add queues, ... */
@@ -139,19 +150,53 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void const * argument)
 {
 
-  /* USER CODE BEGIN StartDefaultTask */
-  /* Infinite loop */
+	bool firstrun = true;
+
   for(;;)
-  {
-//	  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 10, 0);
-//	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+  {	  if(firstrun){
+
+	  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 10, 0);
+	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 1);
 	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+	  isTaskSuspendedInAC = false;
 	  MCP2515_WriteByte(MCP2515_CANINTF,0x00);
-	  vTaskDelete(defaultTaskHandle);
-
   }
-  /* USER CODE END StartDefaultTask */
+  	  if(xSemaphoreTake(globAliveCounterHandle,2000)){
+  		  if(isTaskSuspendedInAC){
+  			  if(!(isTaskSuspendedInCAN||isTaskSuspendedInMF)){
+  				vTaskResume(SettFartTaskHandle);
+  			  }
+  			  isTaskSuspendedInAC = false;
+  		  }
+  	  }else{
+  		  if(isTaskSuspendedInAC==false){
+  			vTaskSuspend(SettFartTaskHandle);
+  			isTaskSuspendedInAC = true;
+  		  }
+		MOTOR_PWM_SET(0,1000);
+  	  }
+  }
+}
+
+void StartAliveCounterTask(void const * argument)
+{
+	uCAN_MSG aliveTxMessage;
+	aliveTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+	aliveTxMessage.frame.id = WDRW_FL_STAT;
+	aliveTxMessage.frame.dlc = 2;
+	aliveTxMessage.frame.data0 = 0x00;
+	aliveTxMessage.frame.data1 = 0x00;
+  for(;;)
+  {
+	  aliveTxMessage.frame.data1++;
+	  if(aliveTxMessage.frame.data1>=256){
+		  aliveTxMessage.frame.data1 = 0;
+	  }
+	  CANSPI_Transmit(&aliveTxMessage);
+	  vTaskDelay(1000);
+  }
 }
 
 /* StartTask02 function */
@@ -170,7 +215,7 @@ void StartMotorTask(void const * argument)
 		} else {
 			fartkonst2 = 1000;
 		}
-		PWM_Set_Frekvens(fart,fartkonst2);
+		MOTOR_PWM_SET(fart,fartkonst2);
 	}
   }
   /* USER CODE END StartTask02 */
@@ -184,20 +229,37 @@ void StartMotorFaultTask(void const * argument)
   for(;;)
   {
 
-//	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
-//		  PWM_Set_Frekvens(0);
-//		  MOTOR_STATE(0);
-//		  vTaskDelay(300);
-//		  MOTOR_STATE(1);
-//		  uCAN_MSG tempTxMessage;
-//		  tempTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-//		  tempTxMessage.frame.id = 0x222;
-//		  tempTxMessage.frame.dlc = 1;
-//		  tempTxMessage.frame.data0 = 0x01;
-//		  CANSPI_Transmit(&tempTxMessage);
-//
-//
-//	  }
+	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
+
+
+		  vTaskSuspend(SettFartTaskHandle);
+		  isTaskSuspendedInMF = true;
+
+		  MOTOR_PWM_SET(0,1000);
+
+		  uCAN_MSG tempTxMessage;
+		  tempTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+		  tempTxMessage.frame.id = 0x222;
+		  tempTxMessage.frame.dlc = 1;
+		  tempTxMessage.frame.data0 = 0x01;
+		  CANSPI_Transmit(&tempTxMessage);
+
+		  vTaskDelay(300);
+
+		  tempTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+		  tempTxMessage.frame.id = 0x222;
+		  tempTxMessage.frame.dlc = 1;
+		  tempTxMessage.frame.data0 = 0x01;
+		  CANSPI_Transmit(&tempTxMessage);
+
+		  vTaskDelay(100);
+
+
+		  if(!(isTaskSuspendedInAC||isTaskSuspendedInCAN)){
+			  vTaskResume(SettFartTaskHandle);
+		  }
+		  isTaskSuspendedInMF = false;
+	  }
   }
   /* USER CODE END StartTask02 */
 }
@@ -240,6 +302,7 @@ void StartCANTask(void const * argument)
 	uCAN_MSG tempRxMessage;
 	uint16_t fart;
 	int32_t radius;
+
   for(;;)
   {
 
@@ -247,16 +310,43 @@ void StartCANTask(void const * argument)
 
 		  if(CANSPI_Receive(&tempRxMessage)){
 			  switch (tempRxMessage.frame.id) {
-				case 0x100:
+
+				case GLOB_DRIVE:
 					if (((tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1)==0x8000){
 						fart = 0xFFFF;
 					} else {
 						fart = ((tempRxMessage.frame.data0&0x80)<<8);
 						fart += (abs((int16_t)((tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1)));
 					}
-					xQueueSend(FartQueueHandle,&fart,0);
+					xQueueSendToBack(FartQueueHandle,&fart,0);
 					radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
-					xQueueSend(AckerQueueHandle,&radius,0);
+					xQueueSendToBack(AckerQueueHandle,&radius,0);
+
+				case WROT_FL_ANGLE:
+
+
+				case WDRW_FF_STAT: //sett inn rett id
+					if(tempRxMessage.frame.data0&EN_MOTOR){
+						MOTOR_STATE(1);
+					}else if(!(tempRxMessage.frame.data0&EN_MOTOR)){
+						MOTOR_STATE(0);
+					}
+
+				case 0x124: //sett inn rett ID OG IF SETNING
+					if(tempRxMessage.frame.data0){
+						vTaskSuspend(SettFartTaskHandle);
+						isTaskSuspendedInCAN = true;
+						MOTOR_PWM_SET(0,1000);
+					} else {
+						if(!(isTaskSuspendedInAC||isTaskSuspendedInMF)){
+							vTaskResume(SettFartTaskHandle);
+						}
+						isTaskSuspendedInCAN = false;
+					}
+
+				case 0x105:
+					xSemaphoreGive(globAliveCounterHandle);
+
 				default:
 					break;
 			}

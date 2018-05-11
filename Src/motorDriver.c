@@ -16,10 +16,7 @@ bool retning;
 
 
 
-void PWM_Set_Frekvens(uint16_t tempfart, uint16_t konst){
-
-
-
+void MOTOR_PWM_SET(uint16_t tempfart, uint16_t konst){
 
 
 //	if(HAL_GPIO_ReadPin(DRIVE_EN_GPIO_Port,DRIVE_EN_Pin)){
