@@ -4,7 +4,7 @@
   * Description        : This file provides code for the configuration
   *                      of timers
   ******************************************************************************
-
+*/
 /* Includes ------------------------------------------------------------------*/
 #include "TIM_oppsett.h"
 

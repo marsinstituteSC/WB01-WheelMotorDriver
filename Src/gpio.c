@@ -4,7 +4,7 @@
   * Description        : This file provides code for the configuration
   *                      of all used GPIO pins.
   ******************************************************************************
-
+*/
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 
