@@ -22,27 +22,27 @@ typedef union {
 
 
 #ifdef motorVF
-uint16_t prosent = 140/100;
+
 #endif
 
 #ifdef motorVM
-uint16_t prosent = 120/100;
+
 #endif
 
 #ifdef motorVB
-uint16_t prosent = 100/100;
+
 #endif
 
 #ifdef motorHF
-uint16_t prosent = 80/100;
+
 #endif
 
 #ifdef motorHM
-uint16_t prosent = 60/100;
+
 #endif
 
 #ifdef motorHB
-uint16_t prosent = 40/100;
+
 #endif
 
 void MOTOR_PWM_SET(uint16_t tempfart, uint16_t konst);

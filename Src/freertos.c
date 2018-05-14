@@ -3,48 +3,7 @@
   * File Name          : freertos.c
   * Description        : Code for freertos applications
   ******************************************************************************
-  * This notice applies to any and all portions of this file
-  * that are not between comment pairs USER CODE BEGIN and
-  * USER CODE END. Other portions of this file, whether 
-  * inserted by the user or by software development tools
-  * are owned by their respective copyright owners.
-  *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
-  * All rights reserved.
-  *
-  * Redistribution and use in source and binary forms, with or without 
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice, 
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other 
-  *    contributors to this software may be used to endorse or promote products 
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this 
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under 
-  *    this license is void and will automatically terminate your rights under 
-  *    this license. 
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
-  */
+*/
 
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
@@ -56,22 +15,18 @@
 #include "stdlib.h"
 #include "MCP2515.h"
 
-/* USER CODE BEGIN Includes */     
-
-/* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
 osThreadId AliveCounterTaskHandle;
-osThreadId SettFartTaskHandle;
+osThreadId MotorControlTaskHandle;
 osThreadId AckermannTaskHandle;
-osThreadId CANbehandlingTaskHandle;
+osThreadId CANReceiveTaskHandle;
 osThreadId MotorFaultTaskHandle;
-QueueHandle_t MeldingQueueHandle;
-QueueHandle_t FartQueueHandle;
+QueueHandle_t VelocityQueueHandle;
 QueueHandle_t AckerQueueHandle;
-SemaphoreHandle_t ISRSemaHandleCAN;
-SemaphoreHandle_t ISRSemaHandleFault;
+SemaphoreHandle_t ISRCANSemaHandle;
+SemaphoreHandle_t ISRFaultSemaHandle;
 SemaphoreHandle_t AckerProtHandle;
 SemaphoreHandle_t globAliveCounterHandle;
 
@@ -79,47 +34,44 @@ SemaphoreHandle_t globAliveCounterHandle;
 bool isTaskSuspendedInAC;
 bool isTaskSuspendedInMF;
 bool isTaskSuspendedInCAN;
-int32_t fartkonst;
+int32_t AckermannFactor;
 uint16_t farttest;
 uint16_t farttest2;
+uint16_t test1;
+uint16_t test2;
+uint16_t test3;
 
-/* USER CODE BEGIN Variables */
 
-/* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
 void StartDefaultTask(void const * argument);
 void StartAliveCounterTask(void const * argument);
-void StartMotorTask(void const * argument);
+void StartMotorControlTask(void const * argument);
 void StartMotorFaultTask(void const * argument);
 void StartAckermannTask(void const * argument);
-void StartCANTask(void const * argument);
+void StartCANReceiveTask(void const * argument);
 
-void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
-
-/* USER CODE BEGIN FunctionPrototypes */
-
-/* USER CODE END FunctionPrototypes */
-
-/* Hook prototypes */
+void MX_FREERTOS_Init(void);
 
 /* Init FreeRTOS */
 
 void MX_FREERTOS_Init(void) {
 
 
-  /* Create the thread(s) */
+  /* Create the threads */
   /* definition and creation of defaultTask */
   osThreadDef(defaultTask, StartDefaultTask, osPriorityRealtime, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
+  /* definition and creation of AliveCounterTask */
   osThreadDef(AliveCounterTask, StartAliveCounterTask, osPriorityRealtime, 0, 128);
   AliveCounterTaskHandle = osThreadCreate(osThread(AliveCounterTask), NULL);
 
-  /* definition and creation of SettFartTask */
-  osThreadDef(SettFartTask, StartMotorTask, osPriorityAboveNormal, 0, 128);
-  SettFartTaskHandle = osThreadCreate(osThread(SettFartTask), NULL);
+  /* definition and creation of MotorControlTask */
+  osThreadDef(MotorControlTask, StartMotorControlTask, osPriorityAboveNormal, 0, 128);
+  MotorControlTaskHandle = osThreadCreate(osThread(MotorControlTask), NULL);
 
+  /* definition and creation of MotorFaultTask */
   osThreadDef(MotorFaultTask, StartMotorFaultTask, osPriorityNormal, 0, 128);
    MotorFaultTaskHandle = osThreadCreate(osThread(MotorFaultTask), NULL);
 
@@ -127,22 +79,22 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(AckermannTask, StartAckermannTask, osPriorityNormal, 0, 128);
   AckermannTaskHandle = osThreadCreate(osThread(AckermannTask), NULL);
 
-  /* definition and creation of CANbehandling */
-  osThreadDef(CANbehandlingTask, StartCANTask, osPriorityRealtime, 0, 128);
-  CANbehandlingTaskHandle = osThreadCreate(osThread(CANbehandlingTask), NULL);
+  /* definition and creation of CANReceiveTask */
+  osThreadDef(CANReceiveTask, StartCANReceiveTask, osPriorityRealtime, 0, 128);
+  CANReceiveTaskHandle = osThreadCreate(osThread(CANReceiveTask), NULL);
 
 
 
-  /* USER CODE BEGIN RTOS_QUEUES */
-  FartQueueHandle = xQueueCreate(16,sizeof(uint16_t));
-  AckerQueueHandle = xQueueCreate(16,sizeof(uint32_t));
-  ISRSemaHandleCAN = xSemaphoreCreateBinary();
-  ISRSemaHandleFault = xSemaphoreCreateBinary();
+  /* Creation of queues */
+  VelocityQueueHandle = xQueueCreate(1,sizeof(uint16_t));
+  AckerQueueHandle = xQueueCreate(1,sizeof(uint32_t));
+
+  /* Creation of Mutexes and Semaphores */
+  ISRCANSemaHandle = xSemaphoreCreateBinary();
+  ISRFaultSemaHandle = xSemaphoreCreateBinary();
   globAliveCounterHandle = xSemaphoreCreateBinary();
   AckerProtHandle = xSemaphoreCreateMutex();
 
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
 }
 
 
@@ -154,34 +106,46 @@ void StartDefaultTask(void const * argument)
 
   for(;;)
 
-  {	  if(firstrun){
+  {	  if(firstrun){ // Run on startup
 
+	  // Enable interrupt on CAN_INT-pin and motorfault-pin
+	  // Interrupt before the kernel has started stops the system,
+	  // therefore we set enable it in a task
 	  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 10, 0);
 	  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 	  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 10, 1);
 	  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 	  isTaskSuspendedInAC = false;
+
+	  // Clear interruption flag in MCP2515 in case message was received before kernel start
 	  MCP2515_WriteByte(MCP2515_CANINTF,0x00);
+//	  vTaskDelete(defaultTaskHandle);
   }
-  	  if(xSemaphoreTake(globAliveCounterHandle,2000)){
-  		  if(isTaskSuspendedInAC){
-  			  if(!(isTaskSuspendedInCAN||isTaskSuspendedInMF)){
-  				vTaskResume(SettFartTaskHandle);
-  			  }
-  			  isTaskSuspendedInAC = false;
-  		  }
-  	  }else{
-  		  if(isTaskSuspendedInAC==false){
-  			vTaskSuspend(SettFartTaskHandle);
-  			isTaskSuspendedInAC = true;
-  		  }
-		MOTOR_PWM_SET(0,1000);
-  	  }
+  		  // Waits 2000ms for alive-counter signal from motherboard, suspends MotorControlTask if one is not received
+  	  	  // Commented out because it is not implemented in the motherboard
+
+//  	  if(xSemaphoreTake(globAliveCounterHandle,2000)){
+//  		  if(isTaskSuspendedInAC){
+//  			  if(!(isTaskSuspendedInCAN||isTaskSuspendedInMF)){
+//  				vTaskResume(MotorControlTaskHandle);
+//  			  }
+//  			  isTaskSuspendedInAC = false;
+//  		  }
+//  	  }else{
+//  		  if(isTaskSuspendedInAC==false){
+//  			vTaskSuspend(MotorControlTaskHandle);
+//  			isTaskSuspendedInAC = true;
+//  		  }
+//			MOTOR_PWM_SET(0,1000);
+//  	  }
   }
 }
 
+/* StartAliveCounterTask function */
 void StartAliveCounterTask(void const * argument)
 {
+	// Define Alive-counter CAN-message
 	uCAN_MSG aliveTxMessage;
 	aliveTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
 	aliveTxMessage.frame.id = WDRW_FL_STAT;
@@ -190,88 +154,96 @@ void StartAliveCounterTask(void const * argument)
 	aliveTxMessage.frame.data1 = 0x00;
   for(;;)
   {
+	  // Increment the counter in data1, set to 0 when overflow occurs
 	  aliveTxMessage.frame.data1++;
 	  if(aliveTxMessage.frame.data1>=256){
 		  aliveTxMessage.frame.data1 = 0;
 	  }
+
+	  // If task is suspended by motorfaulttask, set bit in data0 to signal this to motherboard
+	  if(isTaskSuspendedInMF){
+		  aliveTxMessage.frame.data0 = 0x01;
+	  } else {
+		  aliveTxMessage.frame.data0 = 0x00;
+	  }
 	  CANSPI_Transmit(&aliveTxMessage);
-	  vTaskDelay(1000);
+	  vTaskDelay(1000); // Delay 1000ms
   }
 }
 
-/* StartTask02 function */
-void StartMotorTask(void const * argument)
+/* StartMotorControlTask function */
+void StartMotorControlTask(void const * argument)
 {
-  /* USER CODE BEGIN StartTask02 */
-  /* Infinite loop */
-	uint16_t fartkonst2 = 1000;
-	uint16_t fart = 0;
+	uint16_t AckermannFactor2 = 1000;
+	uint16_t tempvelocity = 0;
+
+	/* Infinite loop */
   for(;;)
   {
-	if(xQueueReceive(FartQueueHandle,&fart,osWaitForever)){
-		if(xSemaphoreTake(AckerProtHandle,10)){
-			fartkonst2 = (uint16_t)fartkonst;
+
+	if(xQueueReceive(VelocityQueueHandle,&tempvelocity,osWaitForever)){		// Wait for CANReceiveTask to put data on queue
+		test1 = tempvelocity;
+		if(xSemaphoreTake(AckerProtHandle,10)){						// Use mutex to protect data
+			AckermannFactor2 = (uint16_t)AckermannFactor;
 			xSemaphoreGive(AckerProtHandle);
 		} else {
-			fartkonst2 = 1000;
+			AckermannFactor2 = 1000;
 		}
-		MOTOR_PWM_SET(fart,fartkonst2);
+		MOTOR_PWM_SET(tempvelocity,AckermannFactor2); 						// Send velocity and Ackermannfactor to method
 	}
   }
-  /* USER CODE END StartTask02 */
 }
 
-
+/* StartMotorFaultTask function */
 void StartMotorFaultTask(void const * argument)
 {
-  /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
   for(;;)
   {
 
-	  if(xSemaphoreTake(ISRSemaHandleFault,osWaitForever)){
+	  if(xSemaphoreTake(ISRFaultSemaHandle,osWaitForever)){ 			// Wait for interrupt signal
 
+//		  HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_15);
 
-		  vTaskSuspend(SettFartTaskHandle);
-		  isTaskSuspendedInMF = true;
+		  vTaskSuspend(MotorControlTaskHandle);							// Suspend MotorControlTask
+		  isTaskSuspendedInMF = true;									// Set indicator that the task is suspended
 
-		  MOTOR_PWM_SET(0,1000);
+		  MOTOR_PWM_SET(0,1000);										// Shut off PWM-signal
 
-		  uCAN_MSG tempTxMessage;
-		  tempTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-		  tempTxMessage.frame.id = 0x222;
-		  tempTxMessage.frame.dlc = 1;
-		  tempTxMessage.frame.data0 = 0x01;
-		  CANSPI_Transmit(&tempTxMessage);
+		  uCAN_MSG faultTxMessage;
+		  faultTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+		  faultTxMessage.frame.id = WDRW_FF_FAULT;
+		  faultTxMessage.frame.dlc = 1;
+		  faultTxMessage.frame.data0 = 0x03;
+		  CANSPI_Transmit(&faultTxMessage);								// Transmit message to other nodes and PDB to shut off power
 
 		  vTaskDelay(300);
 
-		  tempTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-		  tempTxMessage.frame.id = 0x222;
-		  tempTxMessage.frame.dlc = 1;
-		  tempTxMessage.frame.data0 = 0x01;
-		  CANSPI_Transmit(&tempTxMessage);
+		  faultTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+		  faultTxMessage.frame.id = WDRW_FF_FAULT;
+		  faultTxMessage.frame.dlc = 1;
+		  faultTxMessage.frame.data0 = 0x00;
+		  CANSPI_Transmit(&faultTxMessage);								// Transmit message to other nodes and PDB to turn on power
 
 		  vTaskDelay(100);
 
 
-		  if(!(isTaskSuspendedInAC||isTaskSuspendedInCAN)){
+		  if(!(isTaskSuspendedInAC||isTaskSuspendedInCAN)){				// If MotorControlTask is not suspended by other tasks, resume it
 			  vTaskResume(SettFartTaskHandle);
 		  }
 		  isTaskSuspendedInMF = false;
 	  }
   }
-  /* USER CODE END StartTask02 */
 }
 
-/* StartTask03 function */
+/* StartAckermannTask function */
 void StartAckermannTask(void const * argument)
 {
-  /* USER CODE BEGIN StartTask03 */
 	int32_t radius;
 	uint32_t bredde = 500;
 	uint32_t bredde2 = 15625;
 	uint32_t lengde = 250000;
+
   /* Infinite loop */
   for(;;)
 
@@ -279,72 +251,78 @@ void StartAckermannTask(void const * argument)
 
 	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
 
-		  if(xSemaphoreTake(AckerProtHandle,osWaitForever)){
+		  if(xSemaphoreTake(AckerProtHandle,osWaitForever)){		// Get the mutex for protection of data
 			  if(radius==0x80000000){
-				  fartkonst = 1000;
-			  } else if (( radius==1)||(radius==-1)){
-				  fartkonst = 1000; //fiks
+				  AckermannFactor = 1000;
+			  } else if (( radius==1)||(radius==-1)||(radius==0)){
+				  AckermannFactor = 1000;							// Needs fixing
 			  }else {
-				  fartkonst = (sqrt((float)((radius*radius)-radius*bredde+bredde2+lengde))/radius)*1000;
+				  // Calculate ackermannfactor from radius
+				  AckermannFactor = (sqrt((float)((radius*radius)-radius*bredde+bredde2+lengde))/radius)*1000;
 			  }
-			  if(fartkonst<=0){fartkonst = -fartkonst;}
+			  if(AckermannFactor<=0){AckermannFactor = -AckermannFactor;} // Absolute value
 			  xSemaphoreGive(AckerProtHandle);
 		  }
 	  }
   }
-  /* USER CODE END StartTask03 */
 }
 
-/* StartTask04 function */
-
-void StartCANTask(void const * argument)
+/* StartCANReceiveTask function */
+void StartCANReceiveTask(void const * argument)
 {
 	uCAN_MSG tempRxMessage;
-	uint16_t fart;
+	uint16_t velocity;
 	int32_t radius;
 
   for(;;)
   {
 
-	  if(xSemaphoreTake(ISRSemaHandleCAN,osWaitForever)){
+	  if(xSemaphoreTake(ISRCANSemaHandle,osWaitForever)){		// Wait for interrupt signal from CAN-module
 
-		  if(CANSPI_Receive(&tempRxMessage)){
+		  if(CANSPI_Receive(&tempRxMessage)){					// Receive the message from CAN-module, and switch-case on the ID
 			  switch (tempRxMessage.frame.id) {
 
-				case GLOB_DRIVE:
+				case GLOB_DRIVE:	// Extract velocity and radius from message, send to queues
+
+					// The velocity received is in INT16, the if-else below converts it to MSB=direction and the remaining 15 = velocity
 					if (((tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1)==0x8000){
-						fart = 0xFFFF;
+						velocity = 0xFFFF;
 					} else {
-						fart = ((tempRxMessage.frame.data0&0x80)<<8);
-						fart += (abs((int16_t)((tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1)));
+						velocity = ((tempRxMessage.frame.data0&0x80)<<8);
+						velocity += (abs((int16_t)((tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1)));
 					}
-					xQueueSendToBack(FartQueueHandle,&fart,0);
+
+					xQueueOverwrite(VelocityQueueHandle,&velocity);
+
 					radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
-					xQueueSendToBack(AckerQueueHandle,&radius,0);
+					xQueueOverwrite(AckerQueueHandle,&radius);
 
-				case WROT_FL_ANGLE:
+					radius = 0;
+
+				case WROT_FL_ANGLE: // Implement extraction of angle from message, and send on queue
 
 
-				case WDRW_FF_STAT: //sett inn rett id
+				case WDRW_FF_STAT: // Use data0 to enable/disable the ENA-pin to driver
 					if(tempRxMessage.frame.data0&EN_MOTOR){
 						MOTOR_STATE(1);
 					}else if(!(tempRxMessage.frame.data0&EN_MOTOR)){
 						MOTOR_STATE(0);
 					}
 
-				case 0x124: //sett inn rett ID OG IF SETNING
-					if(tempRxMessage.frame.data0){
-						vTaskSuspend(SettFartTaskHandle);
+				case WDRW_FF_FAULT: // Suspend Motorcontroltask and shut off PWM
+					if(tempRxMessage.frame.data0&0x01){
+						vTaskSuspend(MotorControlTaskHandle);
 						isTaskSuspendedInCAN = true;
 						MOTOR_PWM_SET(0,1000);
 					} else {
+						// Resume task if not suspended by other tasks
 						if(!(isTaskSuspendedInAC||isTaskSuspendedInMF)){
-							vTaskResume(SettFartTaskHandle);
+							vTaskResume(MotorControlTaskHandle);
 						}
 						isTaskSuspendedInCAN = false;
 					}
 
-				case 0x105:
+				case 0x105: // Send signal to defaultTask that motherboard alive counter has updated
 					xSemaphoreGive(globAliveCounterHandle);
 
 				default:
@@ -354,12 +332,6 @@ void StartCANTask(void const * argument)
 			}
 	  }
   }
-  /* USER CODE END StartTask04 */
 }
-
-/* USER CODE BEGIN Application */
-
-//
-/* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

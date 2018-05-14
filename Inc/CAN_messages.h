@@ -1,6 +1,9 @@
 #ifndef CAN_MESSAGES_H_
 #define CAN_MESSAGES_H_
 
+
+/* CAN-bus message ID specification */
+
 #define MASK_ONES		0x7FF
 #define MASK_ZEROES		0x000
 
@@ -30,6 +33,7 @@
 #define WROT_BR_PID 	0x362
 
 #define WDRW_FF_STAT 	0x401
+#define WDRW_FF_FAULT 	0x402
 #define WDRW_FL_STAT 	0x410
 #define WDRW_FR_STAT	0x430
 #define WDRW_ML_STAT	0x440

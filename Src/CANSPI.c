@@ -26,7 +26,7 @@ void CANSPI_Sleep(void)
   MCP2515_SetSleepMode();
 }
 
-/* CAN initialisering  */
+/* CAN initialize  */
 bool CANSPI_Initialize(void)
 {
   RXF0 RXF0reg;
@@ -38,7 +38,7 @@ bool CANSPI_Initialize(void)
   RXM0 RXM0reg;
   RXM1 RXM1reg;
       
-  /* sett Rx Mask-verdier*/
+  /* choose Rx Mask-values*/
   RXM0reg.RXM0SIDH = mask0>>3;
   RXM0reg.RXM0SIDL = (mask0&0x07)<<5;
   RXM0reg.RXM0EID8 = 0x00;
@@ -49,14 +49,14 @@ bool CANSPI_Initialize(void)
   RXM1reg.RXM1EID8 = 0x00;
   RXM1reg.RXM1EID0 = 0x00;
   
-  /* sett RxFilter verdier */
-  RXF0reg.RXF0SIDH = filter0>>3;
-  RXF0reg.RXF0SIDL = (filter0&0x07)<<5;     //Standard Filter
-  RXF0reg.RXF0EID8 = 0x00;
+  /* choose Rx filter values */
+  RXF0reg.RXF0SIDH = filter0>>3;			//Standard Filter
+  RXF0reg.RXF0SIDL = (filter0&0x07)<<5;
+  RXF0reg.RXF0EID8 = 0x00;					//Extended Filter
   RXF0reg.RXF0EID0 = 0x00;
   
   RXF1reg.RXF1SIDH = (filter1&0x7F8)>>3;
-  RXF1reg.RXF1SIDL = (filter1&0x7)<<5;     //Extended Filter
+  RXF1reg.RXF1SIDL = (filter1&0x7)<<5;
   RXF1reg.RXF1EID8 = 0x00;
   RXF1reg.RXF1EID0 = 0x00;
   
@@ -80,15 +80,15 @@ bool CANSPI_Initialize(void)
   RXF5reg.RXF5EID8 = 0x00;
   RXF5reg.RXF5EID0 = 0x00;
   
-  /* Sjekk SPI-kommunikasjon status */
+  /* Start SPI-communication */
   if(!MCP2515_Initialize())
     return false;
     
-  /* Sjekk om i konfigurasjonsmodus */
+  /* Set configurationmode */
   if(!MCP2515_SetConfigMode())
     return false;
   
-  /* Skriv Filter & Mask verdier til MCP2515 */
+  /* Write mask & filter values to MCP2515 */
   MCP2515_WriteByteSequence(MCP2515_RXM0SIDH, MCP2515_RXM0EID0, &(RXM0reg.RXM0SIDH));
   MCP2515_WriteByteSequence(MCP2515_RXM1SIDH, MCP2515_RXM1EID0, &(RXM1reg.RXM1SIDH));
   MCP2515_WriteByteSequence(MCP2515_RXF0SIDH, MCP2515_RXF0EID0, &(RXF0reg.RXF0SIDH));
@@ -103,7 +103,7 @@ bool CANSPI_Initialize(void)
   MCP2515_WriteByte(MCP2515_RXB1CTRL, 0x01);    //Accept Filter 1
   MCP2515_WriteByte(MCP2515_CANINTE, 0x03);		//Enable interrupt on RXB0/RXB1
       
-  /* 
+  /*  Set the correct time-segments:
   * tq = 2 * (brp(0) + 1) / 10000000 = 0.2us
   * tbit = (SYNC_SEG(1 fixed) + PROP_SEG + PS1 + PS2)
   * tbit = 1tq + 1tq + 5tq + 3tq = 10tq
@@ -119,14 +119,14 @@ bool CANSPI_Initialize(void)
   /* 1 0 000 010(3tq PS2) */
   MCP2515_WriteByte(MCP2515_CNF3, 0x82);
   
-  /* Sjekk om normalmodus • */
+  /* Set normalmode • */
   if(!MCP2515_SetNormalMode())
     return false;
   
   return true;
 }
 
-/* CAN send melding */
+/* CAN transmit function */
 uint8_t CANSPI_Transmit(uCAN_MSG *tempCanMsg) 
 {
   uint8_t returnValue = 0;
@@ -138,16 +138,16 @@ uint8_t CANSPI_Transmit(uCAN_MSG *tempCanMsg)
   
   ctrlStatus.ctrl_status = MCP2515_ReadStatus();
   
-  /* Sjekker hvilket TxBuffer som er ledig */
+  /* Check which transmit register i available */
   if (ctrlStatus.TXB0REQ != 1)
   {
-    /* Konverterer ID*/
+    /* Convert ID*/
     convertCANid2Reg(tempCanMsg->frame.id, tempCanMsg->frame.idType, &idReg);
     
-    /* Legg inn Tx-data i buffer */
+    /* Load CAN-message into buffer  */
     MCP2515_LoadTxSequence(MCP2515_LOAD_TXB0SIDH, &(idReg.tempSIDH), tempCanMsg->frame.dlc, &(tempCanMsg->frame.data0));
     
-    /* Instruksjon om å sende innhold i TxBuffer */
+    /* Request to send message  */
     MCP2515_RequestToSend(MCP2515_RTS_TX0);
     
     returnValue = 1;
@@ -174,7 +174,7 @@ uint8_t CANSPI_Transmit(uCAN_MSG *tempCanMsg)
   return (returnValue);
 }
 
-/* CAN motta data */
+/* CAN receive function */
 uint8_t CANSPI_Receive(uCAN_MSG *tempCanMsg) 
 {
   uint8_t returnValue = 0;
@@ -183,10 +183,10 @@ uint8_t CANSPI_Receive(uCAN_MSG *tempCanMsg)
   
   rxStatus.ctrl_rx_status = MCP2515_GetRxStatus();
   
-  /* Sjekk om data i RxBuffer */
+  /* Check if there is message in receive buffer */
   if (rxStatus.rxBuffer != 0)
   {
-    /* Sjekk hvilket buffer data ligger i */
+    /* Which buffer holds message? */
     if ((rxStatus.rxBuffer == MSG_IN_RXB0)|(rxStatus.rxBuffer == MSG_IN_BOTH_BUFFERS))
     {
       MCP2515_ReadRxSequence(MCP2515_READ_RXB0SIDH, rxReg.rx_reg_array, sizeof(rxReg.rx_reg_array));
@@ -196,7 +196,7 @@ uint8_t CANSPI_Receive(uCAN_MSG *tempCanMsg)
       MCP2515_ReadRxSequence(MCP2515_READ_RXB1SIDH, rxReg.rx_reg_array, sizeof(rxReg.rx_reg_array));
     }
     
-    /* Extended type */
+    /* Convert ID, Extended type */
     if (rxStatus.msgType == dEXTENDED_CAN_MSG_ID_2_0B)
     {
       tempCanMsg->frame.idType = (uint8_t) dEXTENDED_CAN_MSG_ID_2_0B;
@@ -204,7 +204,7 @@ uint8_t CANSPI_Receive(uCAN_MSG *tempCanMsg)
     }
     else 
     {
-      /* Standard type */
+      /* Convert ID, Standard type */
       tempCanMsg->frame.idType = (uint8_t) dSTANDARD_CAN_MSG_ID_2_0B;
       tempCanMsg->frame.id = convertReg2StandardCANid(rxReg.RXBnSIDH, rxReg.RXBnSIDL);
     }
@@ -219,14 +219,14 @@ uint8_t CANSPI_Receive(uCAN_MSG *tempCanMsg)
     tempCanMsg->frame.data6 = rxReg.RXBnD6;
     tempCanMsg->frame.data7 = rxReg.RXBnD7;
     
-    MCP2515_WriteByte(MCP2515_CANINTF,0x00); // Resetter flagg
+    MCP2515_WriteByte(MCP2515_CANINTF,0x00); // Reset interrupt flag
     returnValue = 1;
   }
   
   return (returnValue);
 }
 
-/* Sjekk om melding i RxBuffer*/
+/* Check for messages in Rx-buffer*/
 uint8_t CANSPI_messagesInBuffer(void)
 {
   uint8_t messageCount = 0;
@@ -246,7 +246,7 @@ uint8_t CANSPI_messagesInBuffer(void)
   return (messageCount);
 }
 
-/* Sjekk om CAN-bus er offline */
+/* Chek if CAN-bus is offline */
 uint8_t CANSPI_isBussOff(void)
 {
   uint8_t returnValue = 0;
@@ -261,7 +261,7 @@ uint8_t CANSPI_isBussOff(void)
   return (returnValue);
 }
 
-/* Sjekk etter Rx Passive Error */
+/* Check for Rx passive error */
 uint8_t CANSPI_isRxErrorPassive(void)
 {
   uint8_t returnValue = 0;
@@ -276,7 +276,7 @@ uint8_t CANSPI_isRxErrorPassive(void)
   return (returnValue);
 }
 
-/* Sjekk Tx Passive Error */
+/* Check for tx passive error*/
 uint8_t CANSPI_isTxErrorPassive(void)
 {
   uint8_t returnValue = 0;
@@ -291,7 +291,7 @@ uint8_t CANSPI_isTxErrorPassive(void)
   return (returnValue);
 }
 
-/* Konverter til exended ID*/
+/* Convert message ID data to extended ID */
 static uint32_t convertReg2ExtendedCANid(uint8_t tempRXBn_EIDH, uint8_t tempRXBn_EIDL, uint8_t tempRXBn_SIDH, uint8_t tempRXBn_SIDL) 
 {
   uint32_t returnValue = 0;
@@ -313,7 +313,7 @@ static uint32_t convertReg2ExtendedCANid(uint8_t tempRXBn_EIDH, uint8_t tempRXBn
   return (returnValue);
 }
 
-/* Konverter til standard ID  */
+/* Convert to standard ID  */
 static uint32_t convertReg2StandardCANid(uint8_t tempRXBn_SIDH, uint8_t tempRXBn_SIDL) 
 {
   uint32_t returnValue = 0;
@@ -326,7 +326,7 @@ static uint32_t convertReg2StandardCANid(uint8_t tempRXBn_SIDH, uint8_t tempRXBn
   return (returnValue);
 }
 
-/* Konverter CAN-ID til leselig */
+/* Convert entry to register ID*/
 static void convertCANid2Reg(uint32_t tempPassedInID, uint8_t canIdType, id_reg_t *passedIdReg) 
 {
   uint8_t wipSIDL = 0;

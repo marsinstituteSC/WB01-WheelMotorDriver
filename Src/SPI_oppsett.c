@@ -1,4 +1,9 @@
-
+/**
+  ******************************************************************************
+  * File Name          : SPI_oppsett.c
+  * Description        : This file provides code for the configuration
+  *                      of SPI
+  ******************************************************************************
 
 /* Includes ------------------------------------------------------------------*/
 #include "SPI_oppsett.h"
@@ -10,7 +15,7 @@ SPI_HandleTypeDef hspi;
 void SPI_CAN_Init(void)
 {
 
-  hspi.Instance = CAN_SPI;
+  hspi.Instance = CAN_SPI;							// Used for both SPI 2 and 3
   hspi.Init.Mode = SPI_MODE_MASTER;
   hspi.Init.Direction = SPI_DIRECTION_2LINES;
   hspi.Init.DataSize = SPI_DATASIZE_8BIT;
@@ -35,9 +40,6 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
   GPIO_InitTypeDef GPIO_InitStruct;
   if(spiHandle->Instance==SPI3)
   {
-  /* USER CODE BEGIN SPI3_MspInit 0 */
-
-  /* USER CODE END SPI3_MspInit 0 */
     /* SPI3 clock enable */
     __HAL_RCC_SPI3_CLK_ENABLE();
 
@@ -53,9 +55,6 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
     GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /* USER CODE BEGIN SPI3_MspInit 1 */
-
-  /* USER CODE END SPI3_MspInit 1 */
   }
   if(spiHandle->Instance==SPI2)
   {
@@ -82,9 +81,6 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
 
   if(spiHandle->Instance==SPI3)
   {
-  /* USER CODE BEGIN SPI3_MspDeInit 0 */
-
-  /* USER CODE END SPI3_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_SPI3_CLK_DISABLE();
 
@@ -95,9 +91,6 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
     */
     HAL_GPIO_DeInit(GPIOC, GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12);
 
-  /* USER CODE BEGIN SPI3_MspDeInit 1 */
-
-  /* USER CODE END SPI3_MspDeInit 1 */
   }
   if(spiHandle->Instance==SPI2)
   {

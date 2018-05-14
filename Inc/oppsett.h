@@ -16,10 +16,10 @@
 //----- CAN mask & filter oppsett -----//
 #define mask0 MASK_ONES
 #define filter0 GLOB_DRIVE
-#define filter1 FLTR_NULL
+#define filter1 WDRW_FF_FAULT
 
 #define mask1 MASK_ONES
-#define filter2 FLTR_NULL
+#define filter2 WDRW_FF_STAT
 #define filter3 FLTR_NULL
 #define filter4 FLTR_NULL
 #define filter5 FLTR_NULL
@@ -28,29 +28,31 @@
 //----------------------------------------------------//
 
 
-#ifdef MOTORVF
-		#define EN_MOTOR 0x01
-#endif
-#ifdef MOTORHF
-		#define EN_MOTOR 0x02
-#endif
-#ifdef MOTORVM
-		#define EN_MOTOR 0x04
-#endif
-#ifdef MOTORHM
-		#define EN_MOTOR 0x08
-#endif
-#ifdef MOTORVB
-		#define EN_MOTOR 0x10
-#endif
-#ifdef MOTORHB
-		#define EN_MOTOR 0x20
-#endif
+// Implement differences in Ackermann-calculations and WDRW_FF_STAT message bits.
+//#ifdef MOTORVF
+//		#define EN_MOTOR 0x01
+//#endif
+//#ifdef MOTORHF
+//		#define EN_MOTOR 0x02
+//#endif
+//#ifdef MOTORVM
+//		#define EN_MOTOR 0x04
+//#endif
+//#ifdef MOTORHM
+//		#define EN_MOTOR 0x08
+//#endif
+//#ifdef MOTORVB
+//		#define EN_MOTOR 0x10
+//#endif
+//#ifdef MOTORHB
+//		#define EN_MOTOR 0x20
+//#endif
 
 
 
 #ifdef canModulMB1
 
+// CAN-module GPIO-pin definitions for Mikrobus socket 1
 #define CAN_CS_Pin GPIO_PIN_8
 #define CAN_CS_GPIO_Port GPIOE
 #define CAN_INT_Pin GPIO_PIN_10
@@ -62,6 +64,7 @@
 
 #ifdef canModulMB2
 
+// CAN-module GPIO-pin definitions for Mikrobus socket 2
 #define CAN_CS_Pin GPIO_PIN_11
 #define CAN_CS_GPIO_Port GPIOE
 #define CAN_INT_Pin GPIO_PIN_14
@@ -75,6 +78,7 @@
 
 #ifdef adapterModulMB1
 
+// Adapter-module/motordriver GPIO-pin definitions for Mikrobus socket 1
 #define DRIVE_EN_Pin GPIO_PIN_2
 #define DRIVE_EN_GPIO_Port GPIOA
 #define DRIVE_DIR_Pin GPIO_PIN_10
@@ -89,6 +93,7 @@
 
 #ifdef adapterModulMB2
 
+// Adapter-module/motordriver GPIO-pin definitions for Mikrobus socket 1
 #define DRIVE_EN_Pin GPIO_PIN_11
 #define DRIVE_EN_GPIO_Port GPIOE
 #define DRIVE_DIR_Pin GPIO_PIN_14
