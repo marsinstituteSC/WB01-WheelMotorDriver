@@ -13,7 +13,6 @@
 #include "queue.h"
 #include "gpio.h"
 #include "SPI_oppsett.h"
-#include "TIM_oppsett.h"
 
 #include "CANSPI.h"
 #include "motorDriver.h"
@@ -21,10 +20,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-uCAN_MSG txMessage;
-uCAN_MSG rxMessage;
-uint16_t periode;
-uint16_t tellertest;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -46,9 +41,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   SPI_CAN_Init();
-  TIMER_Init();
-
-
   CANSPI_Initialize();
 
 
