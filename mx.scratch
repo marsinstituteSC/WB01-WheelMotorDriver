@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
-<ProjectName>C:\Users\jonso\Desktop\MarsNodeAtollic\MarsNodeAtollic\\MarsNodeAtollic</ProjectName>
+<ProjectName>C:\Users\jonso\Desktop\GitHub\WB01-WheelMotorDriver\\MarsNodeAtollic</ProjectName>
 <CMSIS>..\Drivers\CMSIS</CMSIS>
 <HAL_Driver>C:\Users\jonso\STM32Cube\Repository\STM32Cube_FW_F4_V1.18.0\Drivers\CMSIS</HAL_Driver>
 
@@ -32,16 +32,14 @@
     <usedDebug>true</usedDebug>
     	<debugprobe></debugprobe>
     <optimization></optimization>
-    <icfloc>1</icfloc>
+    <icfloc>0</icfloc>
     <Adefines>
         <define></define>
     </Adefines>   
 
-    <UsedFreeRTOS></UsedFreeRTOS>
+    <UsedFreeRTOS>true</UsedFreeRTOS>
     <Aincludes>
-
-
-	    	<include></include>
+		   		<include></include>
     </Aincludes>
     <Cdefines>
         <define>__weak=__attribute__((weak))</define>
@@ -63,7 +61,10 @@
 	   <include>..\Inc</include>
 	   <include>..\Drivers\STM32F4xx_HAL_Driver\Inc</include>
 	   <include>..\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy</include>
+	   <include>..\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM4F</include>
 	   <include>..\Drivers\CMSIS\Device\ST\STM32F4xx\Include</include>
+	   <include>..\Middlewares\Third_Party\FreeRTOS\Source\include</include>
+	   <include>..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</include>
 	   <include>..\Drivers\CMSIS\Include</include>
 
     </Cincludes>
@@ -82,6 +83,9 @@
 		    	<sourceEntry>
 		    		<name>Drivers</name>
 		    	</sourceEntry>
+		    		<sourceEntry>
+		    			<name>Middlewares</name>
+		    		</sourceEntry>
 		    </sourceEntries>
 
 </Project>

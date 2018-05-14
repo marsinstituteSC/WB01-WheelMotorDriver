@@ -1,2 +1,9 @@
 /Debug/
+<<<<<<< HEAD
 .settings/language.settings.xml
+=======
+*.o
+*.o
+.settings/language.settings.xml
+*.xml
+>>>>>>> DevFreeRTOS

@@ -34,43 +34,24 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
+#include "cmsis_os.h"
+#include "CANSPI.h"
+#include "FreeRTOS.h"
+#include "queue.h"
 
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern SPI_HandleTypeDef hspi3;
+
+extern TIM_HandleTypeDef htim2;
+extern SemaphoreHandle_t ISRCANSemaHandle;
+extern SemaphoreHandle_t ISRFaultSemaHandle;
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
-
-/**
-* @brief This function handles System service call via SWI instruction.
-*/
-void SVC_Handler(void)
-{
-  /* USER CODE BEGIN SVCall_IRQn 0 */
-
-  /* USER CODE END SVCall_IRQn 0 */
-  /* USER CODE BEGIN SVCall_IRQn 1 */
-
-  /* USER CODE END SVCall_IRQn 1 */
-}
-
-/**
-* @brief This function handles Pendable request for system service.
-*/
-void PendSV_Handler(void)
-{
-  /* USER CODE BEGIN PendSV_IRQn 0 */
-
-  /* USER CODE END PendSV_IRQn 0 */
-  /* USER CODE BEGIN PendSV_IRQn 1 */
-
-  /* USER CODE END PendSV_IRQn 1 */
-}
 
 /**
 * @brief This function handles System tick timer.
@@ -80,8 +61,7 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
-  HAL_SYSTICK_IRQHandler();
+  osSystickHandler();
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
@@ -95,17 +75,46 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-* @brief This function handles SPI3 global interrupt.
+* @brief This function handles TIM2 global interrupt.
 */
-void SPI3_IRQHandler(void)
+void TIM2_IRQHandler(void)
 {
-  /* USER CODE BEGIN SPI3_IRQn 0 */
+  /* USER CODE BEGIN TIM2_IRQn 0 */
 
-  /* USER CODE END SPI3_IRQn 0 */
-  HAL_SPI_IRQHandler(&hspi3);
-  /* USER CODE BEGIN SPI3_IRQn 1 */
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
 
-  /* USER CODE END SPI3_IRQn 1 */
+  /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
+* @brief This function handles EXTI line[15:10] interrupts.
+*/
+void EXTI15_10_IRQHandler(void)
+{
+	HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_15);
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+	xSemaphoreGiveFromISR(ISRCANSemaHandle,&xHigherPriorityTaskWoken);
+
+  /* USER CODE END EXTI15_10_IRQn 0 */
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */;
+  /* USER CODE END EXTI15_10_IRQn 1 */
+  	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+void EXTI9_5_IRQHandler(void)
+{
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+	xSemaphoreGiveFromISR(ISRFaultSemaHandle,&xHigherPriorityTaskWoken);
+
+  /* USER CODE END EXTI15_10_IRQn 0 */
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */;
+  /* USER CODE END EXTI15_10_IRQn 1 */
+  	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 /* USER CODE BEGIN 1 */

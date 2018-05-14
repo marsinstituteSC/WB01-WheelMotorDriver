@@ -1,3 +1,1 @@
-stm32f4xx_hal_msp.c:49:6:HAL_MspInit	8	static
-stm32f4xx_hal_msp.c:78:6:HAL_SPI_MspInit	32	static
-stm32f4xx_hal_msp.c:112:6:HAL_SPI_MspDeInit	8	static
+stm32f4xx_hal_msp.c:59:6:HAL_MspInit	8	static
