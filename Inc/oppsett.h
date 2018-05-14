@@ -29,9 +29,9 @@
 
 
 // Implement differences in Ackermann-calculations and WDRW_FF_STAT message bits.
-//#ifdef MOTORVF
-//		#define EN_MOTOR 0x01
-//#endif
+#ifdef MOTORVF
+		#define EN_MOTOR 0x01
+#endif
 //#ifdef MOTORHF
 //		#define EN_MOTOR 0x02
 //#endif

@@ -229,7 +229,7 @@ void StartMotorFaultTask(void const * argument)
 
 
 		  if(!(isTaskSuspendedInAC||isTaskSuspendedInCAN)){				// If MotorControlTask is not suspended by other tasks, resume it
-			  vTaskResume(SettFartTaskHandle);
+			  vTaskResume(MotorControlTaskHandle);
 		  }
 		  isTaskSuspendedInMF = false;
 	  }

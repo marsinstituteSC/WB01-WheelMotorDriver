@@ -26,7 +26,7 @@ void MOTOR_PWM_SET(uint16_t tempvelocity, uint16_t AckerFactor){
 
 		bool direction = (tempvelocity>>15) & 0x01;			// Get the direction and send it to MOTOR_DIR_TOGGLE
 		tempvelocity &= 0x7FFF;								// Remove direction bit from velocity
-		MOTOR_DIR_TOGGLE(retning);
+		MOTOR_DIR_TOGGLE(direction);
 
 		if(tempvelocity >= 1){
 

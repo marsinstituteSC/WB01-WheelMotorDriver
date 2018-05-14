@@ -4,7 +4,7 @@
   * Description        : This file provides code for the configuration
   *                      of SPI
   ******************************************************************************
-
+*/
 /* Includes ------------------------------------------------------------------*/
 #include "SPI_oppsett.h"
 #include "gpio.h"
