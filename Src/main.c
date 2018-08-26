@@ -1,10 +1,12 @@
-/**
+/*
   ******************************************************************************
   * File Name          : main.c
   * Description        : Main program body
   ******************************************************************************
+*/
 
-/* Includes ------------------------------------------------------------------*/
+
+// Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -42,8 +44,8 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
-  /* Initialize all configured peripherals */
+//
+//  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   SPI_CAN_Init();
   TIMER_Init();
@@ -59,11 +61,10 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
-  
+
   /* We should never get here as control is now taken by the scheduler */
 
 	while (1) {
-
 	}
 }
 

@@ -14,6 +14,7 @@
 #include "math.h"
 #include "stdlib.h"
 #include "MCP2515.h"
+#include "oppsett.h"
 
 
 /* Variables -----------------------------------------------------------------*/

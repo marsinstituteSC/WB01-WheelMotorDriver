@@ -31,22 +31,40 @@
 // Implement differences in Ackermann-calculations and WDRW_FF_STAT message bits.
 #ifdef MOTORVF
 		#define EN_MOTOR 0x01
+		#define ACK_LEN
+		#define ACK_WIDTH
+		#define ACK_WIDTH2
 #endif
-//#ifdef MOTORHF
-//		#define EN_MOTOR 0x02
-//#endif
-//#ifdef MOTORVM
-//		#define EN_MOTOR 0x04
-//#endif
-//#ifdef MOTORHM
-//		#define EN_MOTOR 0x08
-//#endif
-//#ifdef MOTORVB
-//		#define EN_MOTOR 0x10
-//#endif
-//#ifdef MOTORHB
-//		#define EN_MOTOR 0x20
-//#endif
+#ifdef MOTORHF
+		#define EN_MOTOR 0x02
+		#define ACK_LEN
+		#define ACK_WIDTH
+		#define ACK_WIDTH2
+#endif
+#ifdef MOTORVM
+		#define EN_MOTOR 0x04
+		#define ACK_LEN
+		#define ACK_WIDTH
+		#define ACK_WIDTH2
+#endif
+#ifdef MOTORHM
+		#define EN_MOTOR 0x08
+		#define ACK_LEN
+		#define ACK_WIDTH
+		#define ACK_WIDTH2
+#endif
+#ifdef MOTORVB
+		#define EN_MOTOR 0x10
+		#define ACK_LEN
+		#define ACK_WIDTH
+		#define ACK_WIDTH2
+#endif
+#ifdef MOTORHB
+		#define EN_MOTOR 0x20
+		#define ACK_LEN
+		#define ACK_WIDTH
+		#define ACK_WIDTH2
+#endif
 
 
 
