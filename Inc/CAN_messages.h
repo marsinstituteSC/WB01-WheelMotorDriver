@@ -14,7 +14,7 @@
 #define GLOB_BATT_PERC 	0x103
 
 #define WROT_FL_STAT 	0x310
-#define WROT_FL_ANGLE 	0x311
+#define WROT_FL_ANGL 	0x311
 #define WROT_FL_PID 	0x312
 #define WROT_FR_STAT 	0x320
 #define WROT_FR_ANGL 	0x321
@@ -32,8 +32,8 @@
 #define WROT_BR_ANGL 	0x361
 #define WROT_BR_PID 	0x362
 
-#define WDRW_FF_STAT 	0x401
-#define WDRW_FF_FAULT 	0x402
+#define WDRW_FF_STAT 	0x400
+#define WDRW_FF_FAULT 	0x401
 #define WDRW_FL_STAT 	0x410
 #define WDRW_FR_STAT	0x430
 #define WDRW_ML_STAT	0x440

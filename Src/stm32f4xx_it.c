@@ -65,6 +65,7 @@ void EXTI15_10_IRQHandler(void)
 }
 void EXTI9_5_IRQHandler(void)
 {
+	HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_15);
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	xSemaphoreGiveFromISR(ISRFaultSemaHandle,&xHigherPriorityTaskWoken);

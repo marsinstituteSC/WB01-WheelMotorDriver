@@ -54,6 +54,7 @@ int main(void)
   CANSPI_Initialize();
 
 
+//  MOTOR_STATE(1); // Enables/disables the motor
 //  MCP2515_WriteByte(MCP2515_CANCTRL, 0x40); // Loopback-mode for CAN-testing
 
   /* Call init function for freertos objects (in freertos.c) */

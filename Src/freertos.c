@@ -88,7 +88,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Creation of queues */
   VelocityQueueHandle = xQueueCreate(1,sizeof(uint16_t));
-  AckerQueueHandle = xQueueCreate(1,sizeof(uint32_t));
+  AckerQueueHandle = xQueueCreate(1,sizeof(int16_t));
 
   /* Creation of Mutexes and Semaphores */
   ISRCANSemaHandle = xSemaphoreCreateBinary();
@@ -121,7 +121,8 @@ void StartDefaultTask(void const * argument)
 
 	  // Clear interruption flag in MCP2515 in case message was received before kernel start
 	  MCP2515_WriteByte(MCP2515_CANINTF,0x00);
-//	  vTaskDelete(defaultTaskHandle);
+	  firstrun = false;
+	  vTaskDelete(defaultTaskHandle);
   }
   		  // Waits 2000ms for alive-counter signal from motherboard, suspends MotorControlTask if one is not received
   	  	  // Commented out because it is not implemented in the motherboard
@@ -184,12 +185,12 @@ void StartMotorControlTask(void const * argument)
 
 	if(xQueueReceive(VelocityQueueHandle,&tempvelocity,osWaitForever)){		// Wait for CANReceiveTask to put data on queue
 		test1 = tempvelocity;
-		if(xSemaphoreTake(AckerProtHandle,10)){						// Use mutex to protect data
-			AckermannFactor2 = (uint16_t)AckermannFactor;
-			xSemaphoreGive(AckerProtHandle);
-		} else {
-			AckermannFactor2 = 1000;
-		}
+//		if(xSemaphoreTake(AckerProtHandle,10)){						// Use mutex to protect data
+//			AckermannFactor2 = (uint16_t)AckermannFactor;
+//			xSemaphoreGive(AckerProtHandle);
+//		} else {
+//			AckermannFactor2 = 1000;
+//		}
 		MOTOR_PWM_SET(tempvelocity,AckermannFactor2); 						// Send velocity and Ackermannfactor to method
 	}
   }
@@ -201,38 +202,38 @@ void StartMotorFaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-
+	  // Is reset implemented in PDB-code?
 	  if(xSemaphoreTake(ISRFaultSemaHandle,osWaitForever)){ 			// Wait for interrupt signal
-
-//		  HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_15);
-
-		  vTaskSuspend(MotorControlTaskHandle);							// Suspend MotorControlTask
-		  isTaskSuspendedInMF = true;									// Set indicator that the task is suspended
-
-		  MOTOR_PWM_SET(0,1000);										// Shut off PWM-signal
-
-		  uCAN_MSG faultTxMessage;
-		  faultTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-		  faultTxMessage.frame.id = WDRW_FF_FAULT;
-		  faultTxMessage.frame.dlc = 1;
-		  faultTxMessage.frame.data0 = 0x03;
-		  CANSPI_Transmit(&faultTxMessage);								// Transmit message to other nodes and PDB to shut off power
-
-		  vTaskDelay(300);
-
-		  faultTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-		  faultTxMessage.frame.id = WDRW_FF_FAULT;
-		  faultTxMessage.frame.dlc = 1;
-		  faultTxMessage.frame.data0 = 0x00;
-		  CANSPI_Transmit(&faultTxMessage);								// Transmit message to other nodes and PDB to turn on power
-
-		  vTaskDelay(100);
-
-
-		  if(!(isTaskSuspendedInAC||isTaskSuspendedInCAN)){				// If MotorControlTask is not suspended by other tasks, resume it
-			  vTaskResume(MotorControlTaskHandle);
-		  }
-		  isTaskSuspendedInMF = false;
+//
+////		  HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_15);
+//
+//		  vTaskSuspend(MotorControlTaskHandle);							// Suspend MotorControlTask
+//		  isTaskSuspendedInMF = true;									// Set indicator that the task is suspended
+//
+//		  MOTOR_PWM_SET(0,1000);										// Shut off PWM-signal
+//
+//		  uCAN_MSG faultTxMessage;
+//		  faultTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+//		  faultTxMessage.frame.id = WDRW_FF_FAULT;
+//		  faultTxMessage.frame.dlc = 1;
+//		  faultTxMessage.frame.data0 = 0x03;
+//		  CANSPI_Transmit(&faultTxMessage);								// Transmit message to other nodes and PDB to shut off power
+//
+//		  vTaskDelay(300);
+//
+//		  faultTxMessage.frame.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+//		  faultTxMessage.frame.id = WDRW_FF_FAULT;
+//		  faultTxMessage.frame.dlc = 1;
+//		  faultTxMessage.frame.data0 = 0x00;
+//		  CANSPI_Transmit(&faultTxMessage);								// Transmit message to other nodes and PDB to turn on power
+//
+//		  vTaskDelay(100);
+//
+//
+//		  if(!(isTaskSuspendedInAC||isTaskSuspendedInCAN)){				// If MotorControlTask is not suspended by other tasks, resume it
+//			  vTaskResume(MotorControlTaskHandle);
+//		  }
+//		  isTaskSuspendedInMF = false;
 	  }
   }
 }
@@ -241,28 +242,40 @@ void StartMotorFaultTask(void const * argument)
 void StartAckermannTask(void const * argument)
 {
 	int32_t radius;
-	uint32_t bredde = 500;
-	uint32_t bredde2 = 15625;
-	uint32_t lengde = 250000;
+	int16_t trueangle_raw;
+	double trueangle_rad;
+	uint32_t bredde1 = 330;
+	uint32_t bredde2 = bredde1*bredde1/4;
+	uint32_t lengde = 540^2;
 
   /* Infinite loop */
   for(;;)
 
   {
 
-	  if(xQueueReceive(AckerQueueHandle,&radius,osWaitForever)){
+	  if(xQueueReceive(AckerQueueHandle,&trueangle_raw,osWaitForever)){
 
 		  if(xSemaphoreTake(AckerProtHandle,osWaitForever)){		// Get the mutex for protection of data
-			  if(radius==0x80000000){
-				  AckermannFactor = 1000;
-			  } else if (( radius==1)||(radius==-1)||(radius==0)){
-				  AckermannFactor = 1000;							// Needs fixing
-			  }else {
-				  // Calculate ackermannfactor from radius
-				  AckermannFactor = (sqrt((float)((radius*radius)-radius*bredde+bredde2+lengde))/radius)*1000;
-			  }
-			  if(AckermannFactor<=0){AckermannFactor = -AckermannFactor;} // Absolute value
-			  xSemaphoreGive(AckerProtHandle);
+
+//			  // Calculate ackermannfactor from true radius (REMEMBER TO CHANGE SIZE OF QUEUE IF SWITCHING TO WANTED RADIUS)
+//			  trueangle_rad = (( 32767 + trueangle_raw ) / ( 32767 + 32768)) * (2*M_PI)-M_PI;
+//			  AckermannFactor = 1 / ( cos(trueangle_rad) - (ACK_WIDTH / ( 2 * ACK_LEN ))*sin(trueangle_rad));
+//
+
+
+//			  //Calculate ackermannfactor from given radius
+////			  if(radius==0x80000000){
+////			  				  AckermannFactor = 1000;
+////			  			  } else if (( radius==1)||(radius==-1)||(radius==0)){
+////			  				  AckermannFactor = 1000;							// Needs fixing
+////			  			  }else {
+//
+////			  				  AckermannFactor = (sqrt((float)((radius*radius)-radius*bredde1+bredde2+lengde*lengde))/radius)*1000;
+////			  }
+
+//
+//			  if(AckermannFactor<=0){AckermannFactor = -AckermannFactor;} // Absolute value
+//			  xSemaphoreGive(AckerProtHandle);
 		  }
 	  }
   }
@@ -274,6 +287,7 @@ void StartCANReceiveTask(void const * argument)
 	uCAN_MSG tempRxMessage;
 	uint16_t velocity;
 	int32_t radius;
+	int16_t trueangle;
 
   for(;;)
   {
@@ -286,6 +300,7 @@ void StartCANReceiveTask(void const * argument)
 				case GLOB_DRIVE:	// Extract velocity and radius from message, send to queues
 
 					// The velocity received is in INT16, the if-else below converts it to MSB=direction and the remaining 15 = velocity
+
 					if (((tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1)==0x8000){
 						velocity = 0xFFFF;
 					} else {
@@ -295,21 +310,24 @@ void StartCANReceiveTask(void const * argument)
 
 					xQueueOverwrite(VelocityQueueHandle,&velocity);
 
-					radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
-					xQueueOverwrite(AckerQueueHandle,&radius);
+					// Extract wanted radius for use in ackermann, (true angle is used instead)
+//					radius = (tempRxMessage.frame.data2<<24)+(tempRxMessage.frame.data3<<16)+(tempRxMessage.frame.data4<<8)+tempRxMessage.frame.data5;
+//					xQueueOverwrite(AckerQueueHandle,&radius);
+//
+//					radius = 0;
 
-					radius = 0;
-
-				case WROT_FL_ANGLE: // Implement extraction of angle from message, and send on queue
-
-
+//				case WROT_FL_ANGL: // Implement extraction of angle from message, and send on queue
+//					trueangle = (tempRxMessage.frame.data0<<8)+tempRxMessage.frame.data1;
+//
+//					xQueueOverwrite(AckerQueueHandle,&trueangle);
+					break;
 				case WDRW_FF_STAT: // Use data0 to enable/disable the ENA-pin to driver
 					if(tempRxMessage.frame.data0&EN_MOTOR){
 						MOTOR_STATE(1);
 					}else if(!(tempRxMessage.frame.data0&EN_MOTOR)){
 						MOTOR_STATE(0);
 					}
-
+					break;
 				case WDRW_FF_FAULT: // Suspend Motorcontroltask and shut off PWM
 					if(tempRxMessage.frame.data0&0x01){
 						vTaskSuspend(MotorControlTaskHandle);
@@ -322,10 +340,10 @@ void StartCANReceiveTask(void const * argument)
 						}
 						isTaskSuspendedInCAN = false;
 					}
-
+					break;
 				case 0x105: // Send signal to defaultTask that motherboard alive counter has updated
 					xSemaphoreGive(globAliveCounterHandle);
-
+					break;
 				default:
 					break;
 			}

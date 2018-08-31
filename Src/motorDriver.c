@@ -35,8 +35,8 @@ void MOTOR_PWM_SET(uint16_t tempvelocity, uint16_t AckerFactor){
 			test2 = AckerFactor;
 			if (tempvelocity <=124){tempvelocity = 124;}		// Check if over max-values, if yes, set to max values
 			if (tempvelocity >= 65535){tempvelocity = 65535;}
-			tempvelocity = tempvelocity*1000;
-			tempvelocity = tempvelocity/AckerFactor;			// Calculates new velocity from the Ackermann steering geometry
+//			tempvelocity = tempvelocity*1000;
+//			tempvelocity = tempvelocity/AckerFactor;			// Calculates new velocity from the Ackermann steering geometry
 
 			PWM_TIMER->ARR = tempvelocity;						// Put in Timer reload and capture compare registers
 			PWM_TIMER->CCR1 = (tempvelocity/2);

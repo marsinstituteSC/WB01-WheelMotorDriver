@@ -5,13 +5,13 @@
 #include "motorDriver.h"
 #include "CAN_messages.h"
 
-// Oppsett moduler og CAN-mask/filter
+// Setup modules and CAN-mask/filter
 //----------------------------------------------------//
 
-#define canModulMB1
-#define adapterModulMB2
-#define MOTORVF								// Velg motor: "MOTORxx", xx = VF / HF / VM / HM / VB / HB
-											// I fartsretning: V/H = venstre/høyre, F/M/B = framme, midt, bak
+#define canModulMB1			// Should not be touched
+#define adapterModulMB2		// Should not be touched
+#define MOTOR_FL								// Choose motor: "MOTORxx", xx = FL / FR / ML / MR / BL / BR
+											// In forward direction:F/M/B = front, middle, back, L/R = left/right
 
 //----- CAN mask & filter oppsett -----//
 #define mask0 MASK_ONES
@@ -20,7 +20,7 @@
 
 #define mask1 MASK_ONES
 #define filter2 WDRW_FF_STAT
-#define filter3 FLTR_NULL
+//#define filter3 WROT_FL_ANGLE  // Set in wheel-specific settings below
 #define filter4 FLTR_NULL
 #define filter5 FLTR_NULL
 
@@ -29,41 +29,47 @@
 
 
 // Implement differences in Ackermann-calculations and WDRW_FF_STAT message bits.
-#ifdef MOTORVF
+#ifdef MOTOR_FL
 		#define EN_MOTOR 0x01
-		#define ACK_LEN
-		#define ACK_WIDTH
+		#define ACK_LEN	540
+		#define ACK_WIDTH 330
 		#define ACK_WIDTH2
+		#define filter3 WROT_FL_ANGL
 #endif
-#ifdef MOTORHF
+#ifdef MOTOR_FR
 		#define EN_MOTOR 0x02
 		#define ACK_LEN
 		#define ACK_WIDTH
 		#define ACK_WIDTH2
+		#define filter3 WROT_FR_ANGL
 #endif
-#ifdef MOTORVM
+#ifdef MOTOR_ML
 		#define EN_MOTOR 0x04
 		#define ACK_LEN
 		#define ACK_WIDTH
 		#define ACK_WIDTH2
+		#define filter3 WROT_ML_ANGL
 #endif
-#ifdef MOTORHM
+#ifdef MOTOR_MR
 		#define EN_MOTOR 0x08
 		#define ACK_LEN
 		#define ACK_WIDTH
 		#define ACK_WIDTH2
+		#define filter3 WROT_MR_ANGL
 #endif
-#ifdef MOTORVB
+#ifdef MOTOR_BL
 		#define EN_MOTOR 0x10
 		#define ACK_LEN
 		#define ACK_WIDTH
 		#define ACK_WIDTH2
+		#define filter3 WROT_BL_ANGL
 #endif
-#ifdef MOTORHB
+#ifdef MOTOR_BR
 		#define EN_MOTOR 0x20
 		#define ACK_LEN
 		#define ACK_WIDTH
 		#define ACK_WIDTH2
+		#define filter3 WROT_BR_ANGL
 #endif
 
 
